@@ -1,8 +1,8 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::MouseScrollAxis;
+// use leafwing_input_manager::prelude::MouseScrollAxis;
 
 #[derive(Resource)]
-pub struct Config {
+/* pub struct Config {
     pub zoom: MouseScrollAxis,
 }
 
@@ -18,7 +18,7 @@ impl Default for Config {
             zoom: MouseScrollAxis::Y,
         }
     }
-}
+} */
 
 /* #[derive(ScheduleLabel, Debug, Hash, PartialEq, Eq, Clone)]
 struct ConfigLoading; */
