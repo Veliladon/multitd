@@ -1,6 +1,13 @@
 use crate::*;
 use leafwing_input_manager::prelude::*;
 
+#[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
+enum InputState {
+    Standard,
+    #[default]
+    Debug,
+}
+
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 pub enum CameraMovement {
     // Movement
@@ -14,7 +21,7 @@ pub enum CameraMovement {
 
 pub const CAMERA_MIN_ZOOM: f32 = 5.0;
 pub const CAMERA_MAX_ZOOM: f32 = 25.;
-pub const CAMERA_SPEED: f32 = 200.;
+pub const CAMERA_SPEED: f32 = 100.;
 
 pub struct ProcessInputPlugin;
 
@@ -22,6 +29,7 @@ impl Plugin for ProcessInputPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(InputManagerPlugin::<CameraMovement>::default())
             .add_systems(PostStartup, camera_control_setup)
+            .init_state::<InputState>()
             .add_systems(Update, player_control)
             .add_systems(Update, zoom_camera)
             .add_systems(Update, move_camera);
@@ -37,6 +45,10 @@ pub fn camera_control_setup(mut commands: Commands, mut camera_query: Query<Enti
     commands
         .entity(camera)
         .insert(InputManagerBundle::with_map(input_map));
+}
+
+fn set_input_state(mut app_state: ResMut<NextState<InputState>>) {
+    app_state.set(InputState::Debug);
 }
 
 pub fn zoom_camera(

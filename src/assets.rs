@@ -1,32 +1,40 @@
-use crate::*;
+use bevy::prelude::*;
 
 pub struct AssetLoadingPlugin;
 
 #[derive(Resource)]
 pub struct GameAssets {
-    pub game_texture: Handle<Image>,
-    pub game_tile: Handle<TextureAtlasLayout>,
+    pub fourway_handle: Handle<Scene>,
+    pub threeway_handle: Handle<Scene>,
+    pub twoway_handle: Handle<Scene>,
+    pub endcap_handle: Handle<Scene>,
 }
 
-pub const TD_ASSETS: &str = "tdassets.png";
+pub const FOURWAY: &str = "4way.glb";
+pub const THREEWAY: &str = "3way.glb";
+pub const TWOWAY: &str = "2way.glb";
+pub const ENDCAP: &str = "endcap.glb";
 
 impl Plugin for AssetLoadingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, load_assets);
+        app.add_systems(PreStartup, load_assets)
     }
 }
 
-pub fn load_assets(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let asset_handle: Handle<Image> = asset_server.load(TD_ASSETS);
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(128), 7, 1, None, None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+pub fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let fourway_handle: Handle<Scene> =
+        asset_server.load(GltfAssetLabel::Scene(0).from_asset(FOURWAY));
+    let threeway_handle: Handle<Scene> =
+        asset_server.load(GltfAssetLabel::Scene(0).from_asset(THREEWAY));
+    let twoway_handle: Handle<Scene> =
+        asset_server.load(GltfAssetLabel::Scene(0).from_asset(TWOWAY));
+    let endcap_handle: Handle<Scene> =
+        asset_server.load(GltfAssetLabel::Scene(0).from_asset(ENDCAP));
 
     commands.insert_resource(GameAssets {
-        game_texture: asset_handle,
-        game_tile: texture_atlas_layout,
+        fourway_handle,
+        threeway_handle,
+        twoway_handle,
+        endcap_handle,
     });
 }

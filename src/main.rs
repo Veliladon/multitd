@@ -1,16 +1,20 @@
 // use assets::AssetLoadingPlugin;
+use crate::assets::GameAssets;
+use assets::AssetLoadingPlugin;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use camera::CameraSetupPlugin;
+use config::ConfigPlugin;
 use input::ProcessInputPlugin;
+use map::MapPlugin;
 
 // mod assets;
+mod assets;
 mod camera;
+mod config;
 mod input;
-
-#[derive(Component)]
-struct Ground;
+mod map;
 
 fn main() {
     App::new()
@@ -26,24 +30,9 @@ fn main() {
         )
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(ProcessInputPlugin)
-        // .add_plugins(AssetLoadingPlugin)
+        .add_plugins(AssetLoadingPlugin)
         .add_plugins(CameraSetupPlugin)
-        .add_systems(Startup, scene_setup)
+        .add_plugins(MapPlugin)
+        .add_plugins(ConfigPlugin)
         .run();
-}
-
-fn scene_setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    // plane
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(20., 20.)),
-            material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-            ..default()
-        },
-        Ground,
-    ));
 }
