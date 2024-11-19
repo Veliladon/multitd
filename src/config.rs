@@ -1,7 +1,6 @@
 use bevy::prelude::*;
-// use leafwing_input_manager::prelude::MouseScrollAxis;
+// use leafwing_input_manager::prelude::*;
 
-#[derive(Resource)]
 /* pub struct Config {
     pub zoom: MouseScrollAxis,
 }

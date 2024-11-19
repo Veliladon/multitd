@@ -19,6 +19,13 @@ pub enum CameraMovement {
     SwitchInputType,
 }
 
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
+pub enum BuilderAction {
+    // Abilities
+    NextMesh,
+    PrevMesh,
+}
+
 pub const CAMERA_MIN_ZOOM: f32 = 5.0;
 pub const CAMERA_MAX_ZOOM: f32 = 25.;
 pub const CAMERA_SPEED: f32 = 100.;
@@ -35,7 +42,8 @@ impl Plugin for ProcessInputPlugin {
             .add_systems(Update, player_control)
             .add_systems(Update, switch_input_types)
             .add_systems(Update, zoom_camera)
-            .add_systems(Update, move_camera);
+            .add_systems(Update, move_camera)
+            .add_systems(Update, builder_control);
     }
 }
 
@@ -45,10 +53,15 @@ pub fn camera_control_setup(mut commands: Commands, mut camera_query: Query<Enti
         .with_axis(CameraMovement::Zoom, MouseScrollAxis::Y)
         .with_dual_axis(CameraMovement::Pan, KeyboardVirtualDPad::WASD);
 
+    let builder_input_map = InputMap::default()
+        .with(BuilderAction::PrevMesh, KeyCode::KeyQ)
+        .with(BuilderAction::NextMesh, KeyCode::KeyE);
+
     let camera = camera_query.single_mut();
     commands
         .entity(camera)
-        .insert(InputManagerBundle::with_map(input_map));
+        .insert(InputManagerBundle::with_map(input_map))
+        .insert(InputManagerBundle::with_map(builder_input_map));
 }
 
 pub fn zoom_camera(
@@ -95,11 +108,11 @@ pub fn move_camera(
     camera_transform.translation.z -= axis_pair.y;
 }
 
-/*pub fn mouseover_maze(mut commands: Commands, mut over_event_reader: EventReader<Pointer<Over>>, mut out_event_reader: EventReader<Pointer<Out>>) {
-    for event in over_event_reader.read() {
-        commands.entity(event.entity)
+pub fn builder_control(mut camera_query: Query<&ActionState<BuilderAction>, With<Camera>>) {
+    let action_state = camera_query.single_mut();
+    if action_state.just_pressed(&BuilderAction::NextMesh) {}
 
-    }
-} */
+    if action_state.just_pressed(&BuilderAction::PrevMesh) {}
+}
 
 pub fn player_control() {}

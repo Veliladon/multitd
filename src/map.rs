@@ -1,10 +1,13 @@
 use super::*;
-use bevy::color::palettes::css::*;
+use bevy::pbr::CascadeShadowConfigBuilder;
 use bevy_mod_picking::prelude::*;
-use std::f32::consts::TAU;
+use std::f32::consts::{PI, TAU};
 
 #[derive(Component)]
 struct Ground;
+
+#[derive(Component, Deref, DerefMut)]
+struct GridPos(IVec2);
 
 /* #[derive(Component)]
 struct HoverSelection; */
@@ -56,10 +59,34 @@ fn scene_setup(
     game_assets: Res<GameAssets>,
 ) {
     // Ambient Light
-    commands.insert_resource(AmbientLight {
+
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            illuminance: light_consts::lux::OVERCAST_DAY,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform {
+            translation: Vec3::new(0.0, 2.0, 0.0),
+            rotation: Quat::from_rotation_x(-PI / 4.),
+            ..default()
+        },
+        // The default cascade config is designed to handle large scenes.
+        // As this example has a much smaller world, we can tighten the shadow
+        // bounds for better visual quality.
+        cascade_shadow_config: CascadeShadowConfigBuilder {
+            first_cascade_far_bound: 4.0,
+            maximum_distance: 10.0,
+            ..default()
+        }
+        .into(),
+        ..default()
+    });
+
+    /* commands.insert_resource(AmbientLight {
         color: WHITE.into(),
         brightness: 10000.00,
-    });
+    }); */
 
     // Ground Plane
 
@@ -84,6 +111,9 @@ fn scene_setup(
                             ..default()
                         },
                         Ground,
+                        GridPos {
+                            0: IVec2::new(x as i32, z as i32),
+                        },
                         PickableBundle::default(),
                         HIGHLIGHT_TINT,
                     ));
@@ -131,6 +161,7 @@ fn scene_setup(
 
     commands.spawn(SceneBundle {
         scene: game_assets.endcap_handle.clone(),
+
         transform: Transform::from_xyz(6., 0.5, 6.)
             .with_rotation(Quat::from_rotation_y(TAU / 4. * 3.)),
         ..default()
