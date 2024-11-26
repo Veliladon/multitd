@@ -1,4 +1,4 @@
-use crate::*;
+use crate::prelude::*;
 use bevy_inspector_egui::quick::StateInspectorPlugin;
 use leafwing_input_manager::prelude::*;
 

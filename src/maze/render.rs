@@ -12,12 +12,7 @@ struct GridPos(IVec2);
 /* #[derive(Component)]
 struct HoverSelection; */
 
-pub struct MapPlugin;
-
-pub const MAP_HEIGHT: usize = 6;
-pub const MAP_WIDTH: usize = 6;
-pub const CELL_HEIGHT: usize = 6;
-pub const CELL_WIDTH: usize = 6;
+pub struct MazePlugin;
 
 const HIGHLIGHT_TINT: Highlight<StandardMaterial> = Highlight {
     hovered: Some(HighlightKind::new_dynamic(|matl| StandardMaterial {
@@ -47,7 +42,7 @@ const HIGHLIGHT_TINT: Highlight<StandardMaterial> = Highlight {
     EndCap,
 } */
 
-impl Plugin for MapPlugin {
+impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, scene_setup);
     }
@@ -167,62 +162,3 @@ fn scene_setup(
         ..default()
     });
 }
-
-/* fn scene_setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    game_assets: Res<GameAssets>,
-) {
-    // Ambient Light
-    commands.insert_resource(AmbientLight {
-        color: WHITE.into(),
-        brightness: 10000.00,
-    });
-
-    // Road Plane
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(36., 36.)),
-            material: materials.add(Color::srgb(0.3, 0.5, 0.0)),
-            ..default()
-        },
-        Ground,
-    ));
-
-    // 4-Way Junction
-    commands.spawn(SceneBundle {
-        scene: game_assets.fourway_handle.clone(),
-        transform: Transform::from_xyz(3., 0., 0.),
-        ..default()
-    });
-
-    // 3-Way Junction
-    commands.spawn(SceneBundle {
-        scene: game_assets.threeway_handle.clone(),
-        transform: Transform::from_xyz(9., 0., 0.),
-        ..default()
-    });
-
-    // 2-Way Junction
-
-    commands.spawn(SceneBundle {
-        scene: game_assets.twoway_handle.clone(),
-        transform: Transform::from_xyz(15., 0., 0.),
-        ..default()
-    });
-
-    // End Cap
-    commands.spawn(SceneBundle {
-        scene: game_assets.endcap_handle.clone(),
-        transform: Transform::from_xyz(3., 0., 6.),
-        ..default()
-    });
-
-    commands.spawn(SceneBundle {
-        scene: game_assets.endcap_handle.clone(),
-        transform: Transform::from_xyz(9., 0., 6.).with_rotation(Quat::from_rotation_y(TAU / 4.)),
-        ..default()
-    });
-}
- */

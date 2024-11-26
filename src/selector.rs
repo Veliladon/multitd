@@ -1,4 +1,4 @@
-use crate::*;
+use crate::prelude::*;
 
 #[derive(Resource, Default, Debug, Clone, PartialEq, Eq, Hash, Reflect, Deref, DerefMut)]
 pub struct CursorPiece(pub MazePieces);
