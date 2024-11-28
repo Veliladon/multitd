@@ -44,14 +44,22 @@ const HIGHLIGHT_TINT: Highlight<StandardMaterial> = Highlight {
 
 impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, scene_setup);
+        app.add_systems(Startup, generate_maze)
+            .add_systems(Startup, scene_setup);
     }
+}
+
+fn generate_maze(mut commands: Commands) {
+    let rng = thread_rng();
+    let maze = Maze::new(6, 6, rng);
+    commands.insert_resource(maze);
 }
 
 fn scene_setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     game_assets: Res<GameAssets>,
+    maze: Res<Maze>,
 ) {
     // Ambient Light
 

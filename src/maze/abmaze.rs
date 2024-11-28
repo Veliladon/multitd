@@ -1,0 +1,115 @@
+use rand::prelude::*;
+
+use super::{Maze, MazeBuilder};
+use crate::*;
+
+pub struct ABMaze;
+
+const DIRECTIONS: [IVec2; 4] = [
+    IVec2::new(0, 1),
+    IVec2::new(0, -1),
+    IVec2::new(-1, 0),
+    IVec2::new(1, 0),
+];
+
+impl MazeBuilder for ABMaze {
+    fn new(width: usize, height: usize, mut rng: ThreadRng) -> Maze {
+        let mut maze = Maze {
+            width,
+            height,
+            tiles: vec![Cell::default(); width * height],
+        };
+
+        /* let visited_list = vec![Visited::default(); width * height]; */
+        let mut visited_count: usize = 1;
+
+        let mut pos = IVec2::new(
+            rng.gen_range(0..width) as i32,
+            rng.gen_range(0..height) as i32,
+        );
+
+        while visited_count < (width * height) {
+            let direction = rng.gen_range(0..3);
+
+            let new_pos = pos + *DIRECTIONS.choose(&mut rng).unwrap();
+            let index = maze.idx(pos);
+            let new_index = maze.idx(new_pos);
+
+            println!("I'm at... {:#?} and trying {:#?}", pos, new_pos);
+            if maze.in_bounds(new_pos) && maze.tiles[new_index].visited() == Visited::NotVisited {
+                visited_count += 1;
+                match direction {
+                    0 => {
+                        maze.tiles[new_index].south = Exit::Open;
+                        maze.tiles[index].north = Exit::Open;
+                        println!(
+                            "Making a hole north. Old Cell: {:#?} New Cell: {:#?}",
+                            maze.tiles[index], maze.tiles[new_index]
+                        )
+                    }
+                    1 => {
+                        maze.tiles[new_index].north = Exit::Open;
+                        maze.tiles[index].south = Exit::Open;
+                        println!(
+                            "Making a hole south. Old Cell: {:#?} New Cell: {:#?}",
+                            maze.tiles[index], maze.tiles[new_index]
+                        )
+                    }
+                    2 => {
+                        maze.tiles[new_index].east = Exit::Open;
+                        maze.tiles[index].west = Exit::Open;
+                        println!(
+                            "Making a hole west. Old Cell: {:#?} New Cell: {:#?}",
+                            maze.tiles[index], maze.tiles[new_index]
+                        )
+                    }
+                    3 => {
+                        maze.tiles[new_index].west = Exit::Open;
+                        maze.tiles[index].east = Exit::Open;
+                        println!(
+                            "Making a hole east. Old Cell: {:#?} New Cell: {:#?}",
+                            maze.tiles[index], maze.tiles[new_index]
+                        )
+                    }
+                    _ => panic!("How did you get here? Using loaded dice?"),
+                }
+            }
+            if maze.in_bounds(new_pos) {
+                pos = new_pos;
+                println!("Position in bounds. Changing Position");
+            } else {
+                println!("Staying here because the destination isn't in bounds");
+            }
+
+            println!(
+                "Starting from  {:#?} next. Visited {} tiles",
+                pos, visited_count
+            );
+        }
+        println!("{:#?}", maze);
+        maze
+    }
+}
+
+#[derive(Copy, Clone, PartialEq)]
+pub enum Visited {
+    Visited,
+    NotVisited,
+}
+
+impl Cell {
+    pub fn visited(&self) -> Visited {
+        if self.north == Exit::Open
+            || self.south == Exit::Open
+            || self.east == Exit::Open
+            || self.west == Exit::Open
+        {
+            return Visited::Visited;
+        }
+        Visited::NotVisited
+    }
+}
+
+/* pub fn check_visited(visited: &VecVisisted, index: usize) -> Visited {
+    Visited::NotVisited
+} */
