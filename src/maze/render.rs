@@ -110,7 +110,7 @@ fn scene_setup(
                         PbrBundle {
                             mesh: meshes.add(Plane3d::default().mesh().size(6., 6.)),
                             material: game_assets.ground_material_handle.clone(),
-                            transform: Transform::from_xyz(x_pos, 0.5, z_pos),
+                            transform: Transform::from_xyz(x_pos, 0.0, z_pos),
                             ..default()
                         },
                         Ground,
