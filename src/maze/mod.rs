@@ -43,10 +43,13 @@ impl Maze {
     }
 
     pub fn idx(&self, pos: IVec2) -> usize {
-        ((pos.y * self.width as i32) + pos.x) as usize
+        ((pos.y * (self.width as i32)) + pos.x) as usize
     }
 
     pub fn in_bounds(&self, pos: IVec2) -> bool {
-        pos.x >= 0 && pos.x < self.width as i32 && pos.y >= 0 && pos.y < self.height as i32
+        (pos.x >= 0)
+            && (pos.x < (self.width as i32))
+            && (pos.y >= 0)
+            && (pos.y < (self.height as i32))
     }
 }

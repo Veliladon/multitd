@@ -1,7 +1,10 @@
+use std::f32::consts::TAU;
+
+use bevy::color::palettes::tailwind::{CYAN_300, YELLOW_300};
+//use bevy::picking::pointer::PointerInteraction;
+use bevy::prelude::*;
+
 use crate::prelude::*;
-use bevy::pbr::CascadeShadowConfigBuilder;
-use bevy_mod_picking::prelude::*;
-use std::f32::consts::{PI, TAU};
 
 #[derive(Component)]
 struct Ground;
@@ -9,43 +12,21 @@ struct Ground;
 #[derive(Component, Deref, DerefMut)]
 struct GridPos(IVec2);
 
-/* #[derive(Component)]
-struct HoverSelection; */
+pub const WALL_CUBE_COMMON: Transform = Transform::from_xyz(1.5, 0.5, 1.5);
+pub const PLACE_CUBE_COMMON: Transform = Transform::from_xyz(2.5, 0.5, 2.5);
+pub const WALL_CUBE_OPEN_LEFT: Transform = Transform::from_xyz(-1.5, 0.5, 2.5);
+pub const WALL_CUBE_OPEN_RIGHT: Transform = Transform::from_xyz(1.5, 0.5, 2.5);
+pub const WALL_LONG_CLOSED: Transform = Transform::from_xyz(0.0, 0.5, 2.5);
+pub const PLACE_SHORT_CLOSED: Transform = Transform::from_xyz(0.0, 0.5, 1.5);
+
+// pub const DIRECTION: [Quat; 4] = [Quat.0:(1, 0, 0, 0)];
 
 pub struct MazePlugin;
-
-const HIGHLIGHT_TINT: Highlight<StandardMaterial> = Highlight {
-    hovered: Some(HighlightKind::new_dynamic(|matl| StandardMaterial {
-        base_color: matl
-            .base_color
-            .mix(&Color::srgba(-0.5, -0.3, 0.9, 0.8), 0.5), // hovered is blue
-        ..matl.to_owned()
-    })),
-    pressed: Some(HighlightKind::new_dynamic(|matl| StandardMaterial {
-        base_color: matl
-            .base_color
-            .mix(&Color::srgba(-0.4, -0.4, 0.8, 0.8), 0.5), // pressed is a different blue
-        ..matl.to_owned()
-    })),
-    selected: Some(HighlightKind::new_dynamic(|matl| StandardMaterial {
-        base_color: matl
-            .base_color
-            .mix(&Color::srgba(-0.4, 0.8, -0.4, 0.0), 0.5), // selected is green
-        ..matl.to_owned()
-    })),
-};
-
-/* pub enum MapPieces {
-    FourWay,
-    ThreeWay,
-    TwoWay,
-    EndCap,
-} */
 
 impl Plugin for MazePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, generate_maze)
-            .add_systems(Startup, scene_setup);
+            .add_systems(Startup, scene_setup.after(generate_maze));
     }
 }
 
@@ -58,115 +39,287 @@ fn generate_maze(mut commands: Commands) {
 fn scene_setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    game_assets: Res<GameAssets>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     maze: Res<Maze>,
 ) {
-    // Ambient Light
+    let ground_mesh_handle = meshes.add(Plane3d::default().mesh().size(6., 6.));
+    let ground_material_handle = materials.add(Color::srgb(0.3, 0.5, 0.0));
+    let cube_mesh_handle = meshes.add(Cuboid::new(1., 1., 1.));
+    let wall_cube_material_handle = materials.add(Color::srgb(0.75, 0.75, 0.75));
+    let place_cube_material_handle = materials.add(Color::srgb(0.625, 0.32, 0.175));
+    let place_cube_hover_handle = materials.add(Color::from(CYAN_300));
+    let place_cube_pressed_handle = materials.add(Color::from(YELLOW_300));
+    let long_wall_mesh_handle = meshes.add(Cuboid::new(4., 1., 1.));
+    let short_wall_mesh_handle = meshes.add(Cuboid::new(2., 1., 1.));
 
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            illuminance: light_consts::lux::OVERCAST_DAY,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3::new(0.0, 2.0, 0.0),
-            rotation: Quat::from_rotation_x(-PI / 4.),
-            ..default()
-        },
-        // The default cascade config is designed to handle large scenes.
-        // As this example has a much smaller world, we can tighten the shadow
-        // bounds for better visual quality.
-        cascade_shadow_config: CascadeShadowConfigBuilder {
-            first_cascade_far_bound: 4.0,
-            maximum_distance: 10.0,
-            ..default()
-        }
-        .into(),
-        ..default()
-    });
+    let east_quat = Quat::from_axis_angle(Vec3::Y, TAU / 4.0);
+    let south_quat = Quat::from_axis_angle(Vec3::Y, TAU / 2.0);
+    let west_quat = Quat::from_axis_angle(Vec3::Y, (TAU / 4.0) * 3.);
 
-    /* commands.insert_resource(AmbientLight {
-        color: WHITE.into(),
-        brightness: 10000.00,
-    }); */
+    let north_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
+    let mut east_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
+    east_wall_cube_common_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
+    south_wall_cube_common_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
+    west_wall_cube_common_transform.rotate_around(Vec3::ZERO, west_quat);
 
-    // Ground Plane
+    let north_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
+    let mut east_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
+    east_place_cube_common_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
+    south_place_cube_common_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
+    west_place_cube_common_transform.rotate_around(Vec3::ZERO, west_quat);
+
+    let north_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
+    let mut east_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
+    east_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
+    south_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
+    west_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, west_quat);
+
+    let north_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
+    let mut east_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
+    east_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
+    south_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
+    west_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, west_quat);
+
+    let north_place_short_closed_transform = PLACE_SHORT_CLOSED.clone();
+    let mut east_place_short_closed_transform = PLACE_SHORT_CLOSED.clone();
+    east_place_short_closed_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_place_short_closed_transform = PLACE_SHORT_CLOSED.clone();
+    south_place_short_closed_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_place_short_closed_transform = PLACE_SHORT_CLOSED.clone();
+    west_place_short_closed_transform.rotate_around(Vec3::ZERO, west_quat);
+
+    let north_wall_long_closed_transform = WALL_LONG_CLOSED.clone();
+    let mut east_wall_long_closed_transform = WALL_LONG_CLOSED.clone();
+    east_wall_long_closed_transform.rotate_around(Vec3::ZERO, east_quat);
+    let mut south_wall_long_closed_transform = WALL_LONG_CLOSED.clone();
+    south_wall_long_closed_transform.rotate_around(Vec3::ZERO, south_quat);
+    let mut west_wall_long_closed_transform = WALL_LONG_CLOSED.clone();
+    west_wall_long_closed_transform.rotate_around(Vec3::ZERO, west_quat);
+
+    println!(
+        "Transform: {:?} {:?} {:?} {:?}",
+        north_wall_cube_common_transform,
+        east_wall_cube_common_transform,
+        south_wall_cube_common_transform,
+        west_wall_cube_common_transform
+    );
 
     commands
         .spawn_empty()
-        .insert(SpatialBundle {
-            transform: Transform::from_xyz(0., 0., 0.),
-            visibility: Visibility::Visible,
-            ..default()
-        })
-        .insert(GlobalTransform::default())
+        .insert((Transform::default(), Visibility::default()))
         .with_children(|parent| {
             for z in 0..MAP_HEIGHT {
                 for x in 0..MAP_WIDTH {
                     let z_pos = (z * CELL_HEIGHT) as f32;
                     let x_pos = (x * CELL_WIDTH) as f32;
-                    parent.spawn((
-                        PbrBundle {
-                            mesh: meshes.add(Plane3d::default().mesh().size(6., 6.)),
-                            material: game_assets.ground_material_handle.clone(),
-                            transform: Transform::from_xyz(x_pos, 0.0, z_pos),
-                            ..default()
-                        },
-                        Ground,
-                        GridPos {
-                            0: IVec2::new(x as i32, z as i32),
-                        },
-                        PickableBundle::default(),
-                        HIGHLIGHT_TINT,
-                    ));
+                    parent
+                        .spawn((
+                            Mesh3d(ground_mesh_handle.clone()),
+                            MeshMaterial3d(ground_material_handle.clone()),
+                            Transform::from_xyz(x_pos, 0.0, z_pos),
+                            Ground,
+                            GridPos {
+                                0: IVec2 {
+                                    x: x as i32,
+                                    y: z as i32,
+                                },
+                            },
+                        ))
+                        .with_children(|sub_parent| {
+                            for direction in 0..4 {
+                                match direction {
+                                    0 => {}
+                                    1 => {}
+                                    2 => {}
+                                    3 => {}
+                                    _ => panic!("Shouldn't be here..."),
+                                }
+                            }
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(wall_cube_material_handle.clone()),
+                                north_wall_cube_common_transform,
+                            ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(wall_cube_material_handle.clone()),
+                                east_wall_cube_common_transform,
+                            ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(wall_cube_material_handle.clone()),
+                                south_wall_cube_common_transform,
+                            ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(wall_cube_material_handle.clone()),
+                                west_wall_cube_common_transform,
+                            ));
+                            sub_parent
+                                .spawn((
+                                    Mesh3d(cube_mesh_handle.clone()),
+                                    MeshMaterial3d(place_cube_material_handle.clone()),
+                                    north_place_cube_common_transform,
+                                ))
+                                .observe(update_material_on::<Pointer<Over>>(
+                                    place_cube_hover_handle.clone(),
+                                ))
+                                .observe(update_material_on::<Pointer<Out>>(
+                                    place_cube_material_handle.clone(),
+                                ))
+                                .observe(update_material_on::<Pointer<Down>>(
+                                    place_cube_pressed_handle.clone(),
+                                ))
+                                .observe(update_material_on::<Pointer<Up>>(
+                                    place_cube_hover_handle.clone(),
+                                ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(place_cube_material_handle.clone()),
+                                east_place_cube_common_transform,
+                            ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(place_cube_material_handle.clone()),
+                                south_place_cube_common_transform,
+                            ));
+                            sub_parent.spawn((
+                                Mesh3d(cube_mesh_handle.clone()),
+                                MeshMaterial3d(place_cube_material_handle.clone()),
+                                west_place_cube_common_transform,
+                            ));
+
+                            println!("Spawning North Tile for {} {}", x, z);
+                            match maze.tiles[maze.idx((x as i32, z as i32).into())].north {
+                                Exit::Open => {
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        north_wall_cube_open_left_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        north_wall_cube_open_right_transform,
+                                    ));
+                                }
+                                Exit::Closed => {
+                                    sub_parent.spawn((
+                                        Mesh3d(short_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        north_place_short_closed_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(long_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(place_cube_material_handle.clone()),
+                                        north_wall_long_closed_transform,
+                                    ));
+                                }
+                            }
+                            println!("Spawning East Tile for {} {}", x, z);
+
+                            match maze.tiles[maze.idx((x as i32, z as i32).into())].east {
+                                Exit::Open => {
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        east_wall_cube_open_left_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        east_wall_cube_open_right_transform,
+                                    ));
+                                }
+                                Exit::Closed => {
+                                    sub_parent.spawn((
+                                        Mesh3d(short_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        east_place_short_closed_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(long_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(place_cube_material_handle.clone()),
+                                        east_wall_long_closed_transform,
+                                    ));
+                                }
+                            }
+
+                            println!("Spawning South Tile for {} {}", x, z);
+
+                            match maze.tiles[maze.idx((x as i32, z as i32).into())].south {
+                                Exit::Open => {
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        south_wall_cube_open_left_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        south_wall_cube_open_right_transform,
+                                    ));
+                                }
+                                Exit::Closed => {
+                                    sub_parent.spawn((
+                                        Mesh3d(short_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        south_place_short_closed_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(long_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(place_cube_material_handle.clone()),
+                                        south_wall_long_closed_transform,
+                                    ));
+                                }
+                            }
+
+                            match maze.tiles[maze.idx((x as i32, z as i32).into())].west {
+                                Exit::Open => {
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        west_wall_cube_open_left_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(cube_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        west_wall_cube_open_right_transform,
+                                    ));
+                                }
+                                Exit::Closed => {
+                                    sub_parent.spawn((
+                                        Mesh3d(short_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(wall_cube_material_handle.clone()),
+                                        west_place_short_closed_transform,
+                                    ));
+                                    sub_parent.spawn((
+                                        Mesh3d(long_wall_mesh_handle.clone()),
+                                        MeshMaterial3d(place_cube_material_handle.clone()),
+                                        west_wall_long_closed_transform,
+                                    ));
+                                }
+                            }
+                        });
                 }
             }
         });
+}
 
-    /* commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(36., 36.)),
-            material: materials.add(Color::srgb(0.3, 0.5, 0.0)),
-            ..default()
-        },
-        Ground,
-    )); */
-
-    // 4-Way Junction
-    commands.spawn(SceneBundle {
-        scene: game_assets.fourway_handle.clone(),
-        transform: Transform::from_xyz(0., 0.5, 0.),
-        ..default()
-    });
-
-    // 3-Way Junction
-    commands.spawn(SceneBundle {
-        scene: game_assets.threeway_handle.clone(),
-        transform: Transform::from_xyz(6., 0.5, 0.),
-        ..default()
-    });
-
-    // 2-Way Junction
-
-    commands.spawn(SceneBundle {
-        scene: game_assets.twoway_handle.clone(),
-        transform: Transform::from_xyz(12., 0.5, 0.),
-        ..default()
-    });
-
-    // End Cap
-    commands.spawn(SceneBundle {
-        scene: game_assets.endcap_handle.clone(),
-        transform: Transform::from_xyz(0., 0.5, 6.),
-        ..default()
-    });
-
-    commands.spawn(SceneBundle {
-        scene: game_assets.endcap_handle.clone(),
-
-        transform: Transform::from_xyz(6., 0.5, 6.)
-            .with_rotation(Quat::from_rotation_y(TAU / 4. * 3.)),
-        ..default()
-    });
+fn update_material_on<E>(
+    new_material: Handle<StandardMaterial>,
+) -> impl Fn(Trigger<E>, Query<&mut MeshMaterial3d<StandardMaterial>>) {
+    move |trigger, mut query| {
+        if let Ok(mut material) = query.get_mut(trigger.entity()) {
+            material.0 = new_material.clone();
+        }
+    }
 }

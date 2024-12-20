@@ -29,52 +29,51 @@ impl MazeBuilder for ABMaze {
         );
 
         while visited_count < (width * height) {
-            let direction = rng.gen_range(0..3);
-
-            let new_pos = pos + *DIRECTIONS.choose(&mut rng).unwrap();
-            let index = maze.idx(pos);
-            let new_index = maze.idx(new_pos);
-
+            let direction = rng.gen_range(0..4);
+            println!("Picked {} on the 1d4 direction", direction);
+            let new_pos = pos + DIRECTIONS[direction];
             println!("I'm at... {:#?} and trying {:#?}", pos, new_pos);
-            if maze.in_bounds(new_pos) && maze.tiles[new_index].visited() == Visited::NotVisited {
-                visited_count += 1;
-                match direction {
-                    0 => {
-                        maze.tiles[new_index].south = Exit::Open;
-                        maze.tiles[index].north = Exit::Open;
-                        println!(
-                            "Making a hole north. Old Cell: {:#?} New Cell: {:#?}",
-                            maze.tiles[index], maze.tiles[new_index]
-                        )
-                    }
-                    1 => {
-                        maze.tiles[new_index].north = Exit::Open;
-                        maze.tiles[index].south = Exit::Open;
-                        println!(
-                            "Making a hole south. Old Cell: {:#?} New Cell: {:#?}",
-                            maze.tiles[index], maze.tiles[new_index]
-                        )
-                    }
-                    2 => {
-                        maze.tiles[new_index].east = Exit::Open;
-                        maze.tiles[index].west = Exit::Open;
-                        println!(
-                            "Making a hole west. Old Cell: {:#?} New Cell: {:#?}",
-                            maze.tiles[index], maze.tiles[new_index]
-                        )
-                    }
-                    3 => {
-                        maze.tiles[new_index].west = Exit::Open;
-                        maze.tiles[index].east = Exit::Open;
-                        println!(
-                            "Making a hole east. Old Cell: {:#?} New Cell: {:#?}",
-                            maze.tiles[index], maze.tiles[new_index]
-                        )
-                    }
-                    _ => panic!("How did you get here? Using loaded dice?"),
-                }
-            }
+            let new_index = maze.idx(new_pos);
             if maze.in_bounds(new_pos) {
+                let index = maze.idx(pos);
+                if maze.tiles[new_index].visited() == Visited::NotVisited {
+                    visited_count += 1;
+                    match direction {
+                        0 => {
+                            maze.tiles[new_index].south = Exit::Open;
+                            maze.tiles[index].north = Exit::Open;
+                            println!(
+                                "Making a hole north. Old Cell: {:#?} New Cell: {:#?}",
+                                maze.tiles[index], maze.tiles[new_index]
+                            )
+                        }
+                        1 => {
+                            maze.tiles[new_index].north = Exit::Open;
+                            maze.tiles[index].south = Exit::Open;
+                            println!(
+                                "Making a hole south. Old Cell: {:#?} New Cell: {:#?}",
+                                maze.tiles[index], maze.tiles[new_index]
+                            )
+                        }
+                        2 => {
+                            maze.tiles[new_index].east = Exit::Open;
+                            maze.tiles[index].west = Exit::Open;
+                            println!(
+                                "Making a hole west. Old Cell: {:#?} New Cell: {:#?}",
+                                maze.tiles[index], maze.tiles[new_index]
+                            )
+                        }
+                        3 => {
+                            maze.tiles[new_index].west = Exit::Open;
+                            maze.tiles[index].east = Exit::Open;
+                            println!(
+                                "Making a hole east. Old Cell: {:#?} New Cell: {:#?}",
+                                maze.tiles[index], maze.tiles[new_index]
+                            )
+                        }
+                        _ => panic!("How did you get here? Using loaded dice?"),
+                    }
+                }
                 pos = new_pos;
                 println!("Position in bounds. Changing Position");
             } else {
@@ -99,14 +98,14 @@ pub enum Visited {
 
 impl Cell {
     pub fn visited(&self) -> Visited {
-        if self.north == Exit::Open
-            || self.south == Exit::Open
-            || self.east == Exit::Open
-            || self.west == Exit::Open
+        if self.north == Exit::Closed
+            && self.south == Exit::Closed
+            && self.east == Exit::Closed
+            && self.west == Exit::Closed
         {
-            return Visited::Visited;
+            return Visited::NotVisited;
         }
-        Visited::NotVisited
+        Visited::Visited
     }
 }
 

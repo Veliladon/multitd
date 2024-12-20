@@ -18,7 +18,6 @@ mod prelude {
     pub use bevy::log::LogPlugin;
     pub use bevy::prelude::*;
     pub use bevy_inspector_egui::quick::WorldInspectorPlugin;
-    pub use bevy_mod_picking::DefaultPickingPlugins;
 }
 
 use prelude::*;
@@ -36,7 +35,7 @@ fn main() {
                 }),
         )
         .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(DefaultPickingPlugins)
+        .add_plugins(MeshPickingPlugin)
         .add_plugins(ProcessInputPlugin)
         .add_plugins(AssetLoadingPlugin)
         .add_plugins(CameraSetupPlugin)

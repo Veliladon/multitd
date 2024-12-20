@@ -3,8 +3,8 @@ use crate::prelude::*;
 #[derive(Resource, Default, Debug, Clone, PartialEq, Eq, Hash, Reflect, Deref, DerefMut)]
 pub struct CursorPiece(pub MazePieces);
 
-#[derive(Component)]
-pub struct CursorEntity;
+/* #[derive(Component)]
+pub struct CursorEntity; */
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash, Reflect)]
 pub enum MazePieces {
@@ -29,19 +29,7 @@ impl Plugin for SelectorPlugin {
     }
 }
 
-pub fn setup_selection(mut commands: Commands, game_assets: Res<GameAssets>) {
-    // 4-Way Junction
-
-    commands
-        .spawn(SceneBundle {
-            scene: game_assets.fourway_handle.clone(),
-            transform: Transform::from_xyz(0., 0.5, 0.),
-            visibility: Visibility::Hidden,
-
-            ..default()
-        })
-        .insert(CursorEntity);
-}
+pub fn setup_selection() {}
 
 pub fn process_move() {}
 

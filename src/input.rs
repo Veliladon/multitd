@@ -51,7 +51,7 @@ pub fn camera_control_setup(mut commands: Commands, mut camera_query: Query<Enti
     let input_map = InputMap::default()
         .with(CameraMovement::SwitchInputType, KeyCode::Backquote)
         .with_axis(CameraMovement::Zoom, MouseScrollAxis::Y)
-        .with_dual_axis(CameraMovement::Pan, KeyboardVirtualDPad::WASD);
+        .with_dual_axis(CameraMovement::Pan, VirtualDPad::wasd());
 
     let builder_input_map = InputMap::default()
         .with(BuilderAction::PrevMesh, KeyCode::KeyQ)
@@ -103,7 +103,7 @@ pub fn move_camera(
 ) {
     let (mut camera_transform, action_state) = camera_query.single_mut();
     let mut axis_pair = action_state.clamped_axis_pair(&CameraMovement::Pan);
-    axis_pair = axis_pair * time.delta_seconds() * CAMERA_SPEED;
+    axis_pair = axis_pair * time.delta_secs() * CAMERA_SPEED;
     camera_transform.translation.x += axis_pair.x;
     camera_transform.translation.z -= axis_pair.y;
 }
