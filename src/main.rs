@@ -20,6 +20,10 @@ mod prelude {
     pub use bevy_inspector_egui::quick::WorldInspectorPlugin;
 }
 
+use bevy::{
+    dev_tools::fps_overlay::{FpsOverlayConfig, FpsOverlayPlugin},
+    text::FontSmoothing,
+};
 use prelude::*;
 
 fn main() {
@@ -34,7 +38,26 @@ fn main() {
                     custom_layer: |_| None,
                 }),
         )
+        .add_plugins(FpsOverlayPlugin {
+            config: FpsOverlayConfig {
+                text_config: TextFont {
+                    // Here we define size of our overlay
+                    font_size: 42.0,
+                    // If we want, we can use a custom font
+                    font: default(),
+                    // We could also disable font smoothing,
+                    font_smoothing: FontSmoothing::default(),
+                },
+                // We can also change color of the overlay
+                text_color: Color::srgb(0.0, 1.0, 0.0),
+                enabled: true,
+            },
+        })
         .add_plugins(WorldInspectorPlugin::new())
+        /*        .insert_resource(MeshPickingSettings {
+            require_markers: true,
+            ..default()
+        }) */
         .add_plugins(MeshPickingPlugin)
         .add_plugins(ProcessInputPlugin)
         .add_plugins(AssetLoadingPlugin)
