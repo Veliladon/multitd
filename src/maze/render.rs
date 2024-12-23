@@ -24,22 +24,13 @@ pub const PLACE_CLOSED_RIGHT: Transform = Transform::from_xyz(1.5, 0.5, 2.5);
 
 // pub const DIRECTION: [Quat; 4] = [Quat.0:(1, 0, 0, 0)];
 
-pub struct MazePlugin;
-
-impl Plugin for MazePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Startup, generate_maze)
-            .add_systems(Startup, scene_setup.after(generate_maze));
-    }
-}
-
-fn generate_maze(mut commands: Commands) {
+pub fn generate_maze(mut commands: Commands) {
     let rng = thread_rng();
     let maze = Maze::new(6, 6, rng);
     commands.insert_resource(maze);
 }
 
-fn scene_setup(
+pub fn scene_setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,

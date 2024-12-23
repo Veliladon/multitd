@@ -2,9 +2,11 @@
 mod assets;
 mod camera;
 mod config;
+mod enemy;
 mod input;
 mod maze;
 mod selector;
+mod utils;
 
 mod prelude {
 
@@ -12,12 +14,13 @@ mod prelude {
     pub use crate::assets::*;
     pub use crate::camera::*;
     pub use crate::config::*;
+    pub use crate::enemy::*;
     pub use crate::input::*;
     pub use crate::maze::*;
     pub use crate::selector::*;
+    pub use crate::utils::*;
     pub use bevy::log::LogPlugin;
     pub use bevy::prelude::*;
-    pub use bevy_inspector_egui::quick::WorldInspectorPlugin;
 }
 
 use bevy::{
@@ -53,7 +56,7 @@ fn main() {
                 enabled: true,
             },
         })
-        .add_plugins(WorldInspectorPlugin::new())
+        //.add_plugins(WorldInspectorPlugin::new())
         /*        .insert_resource(MeshPickingSettings {
             require_markers: true,
             ..default()
@@ -63,6 +66,7 @@ fn main() {
         .add_plugins(AssetLoadingPlugin)
         .add_plugins(CameraSetupPlugin)
         .add_plugins(MazePlugin)
+        .add_plugins(EnemyPlugin)
         .add_plugins(SelectorPlugin)
         .add_plugins(ConfigPlugin)
         .run();
