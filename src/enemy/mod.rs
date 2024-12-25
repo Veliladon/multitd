@@ -1,14 +1,16 @@
-use bevy::prelude::*;
+use crate::prelude::*;
 
 mod spawn;
+mod utils;
 
-use spawn::*;
+pub use bevy::time::Time;
+pub use spawn::*;
 
-#[derive(Debug, Resource)]
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, spawn_enemy);
+        app.add_systems(Update, spawn_enemy)
+            .add_systems(Startup, construct_spawners);
     }
 }
