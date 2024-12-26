@@ -21,7 +21,17 @@ pub const PLACE_CLOSED_MIDLEFT: Transform = Transform::from_xyz(-0.5, 0.5, 2.5);
 pub const PLACE_CLOSED_MIDRIGHT: Transform = Transform::from_xyz(0.5, 0.5, 2.5);
 pub const PLACE_CLOSED_RIGHT: Transform = Transform::from_xyz(1.5, 0.5, 2.5);
 
-// pub const DIRECTION: [Quat; 4] = [Quat.0:(1, 0, 0, 0)];
+pub const TRANSFORM_ARRAY: [Transform; 9] = [
+    WALL_CUBE_COMMON,
+    PLACE_CUBE_COMMON,
+    WALL_CUBE_OPEN_LEFT,
+    WALL_CUBE_OPEN_RIGHT,
+    WALL_SHORT_CLOSED,
+    PLACE_CLOSED_LEFT,
+    PLACE_CLOSED_MIDLEFT,
+    PLACE_CLOSED_MIDRIGHT,
+    PLACE_CLOSED_RIGHT,
+];
 
 pub fn generate_maze(mut commands: Commands) {
     let rng = thread_rng();
@@ -44,105 +54,32 @@ pub fn scene_setup(
     let place_cube_pressed_handle = materials.add(Color::from(YELLOW_300));
     let short_wall_mesh_handle = meshes.add(Cuboid::new(2., 1., 1.));
 
-    let east_quat = Quat::from_axis_angle(Vec3::Y, TAU / 4.0);
-    let south_quat = Quat::from_axis_angle(Vec3::Y, TAU / 2.0);
-    let west_quat = Quat::from_axis_angle(Vec3::Y, (TAU / 4.0) * 3.);
+    let quaternion_array = [
+        Quat::from_axis_angle(Vec3::Y, 0.),
+        Quat::from_axis_angle(Vec3::Y, TAU / 4.0),
+        Quat::from_axis_angle(Vec3::Y, TAU / 2.0),
+        Quat::from_axis_angle(Vec3::Y, (TAU / 4.0) * 3.),
+    ];
 
-    let north_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
-    let mut east_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
-    east_wall_cube_common_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut south_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
-    south_wall_cube_common_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut west_wall_cube_common_transform = WALL_CUBE_COMMON.clone();
-    west_wall_cube_common_transform.rotate_around(Vec3::ZERO, west_quat);
+    let rotated_transform_array: Vec<Transform> = TRANSFORM_ARRAY
+        .iter()
+        .flat_map(|transform| {
+            quaternion_array.iter().map(move |quaternion| {
+                let mut new_transform = *transform;
+                new_transform.rotate_around(Vec3::ZERO, *quaternion);
+                new_transform
+            })
+        })
+        .collect();
 
-    let north_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
-    let mut east_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
-    east_place_cube_common_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut south_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
-    south_place_cube_common_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut west_place_cube_common_transform = PLACE_CUBE_COMMON.clone();
-    west_place_cube_common_transform.rotate_around(Vec3::ZERO, west_quat);
+    println!("{:#?}", rotated_transform_array);
 
-    let north_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
-    let mut east_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
-    east_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut south_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
-    south_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut west_wall_cube_open_left_transform = WALL_CUBE_OPEN_LEFT.clone();
-    west_wall_cube_open_left_transform.rotate_around(Vec3::ZERO, west_quat);
-
-    let north_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
-    let mut east_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
-    east_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut south_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
-    south_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut west_wall_cube_open_right_transform = WALL_CUBE_OPEN_RIGHT.clone();
-    west_wall_cube_open_right_transform.rotate_around(Vec3::ZERO, west_quat);
-
-    let north_place_closed_left_transform = PLACE_CLOSED_LEFT.clone();
-    let north_place_closed_midleft_transform = PLACE_CLOSED_MIDLEFT.clone();
-    let north_place_closed_midright_transform = PLACE_CLOSED_MIDRIGHT.clone();
-    let north_place_closed_right_transform = PLACE_CLOSED_RIGHT.clone();
-
-    let mut east_place_closed_left_transform = PLACE_CLOSED_LEFT.clone();
-    east_place_closed_left_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut east_place_closed_midleft_transform = PLACE_CLOSED_MIDLEFT.clone();
-    east_place_closed_midleft_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut east_place_closed_midright_transform = PLACE_CLOSED_MIDRIGHT.clone();
-    east_place_closed_midright_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut east_place_closed_right_transform = PLACE_CLOSED_RIGHT.clone();
-    east_place_closed_right_transform.rotate_around(Vec3::ZERO, east_quat);
-
-    let mut south_place_closed_left_transform = PLACE_CLOSED_LEFT.clone();
-    south_place_closed_left_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut south_place_closed_midleft_transform = PLACE_CLOSED_MIDLEFT.clone();
-    south_place_closed_midleft_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut south_place_closed_midright_transform = PLACE_CLOSED_MIDRIGHT.clone();
-    south_place_closed_midright_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut south_place_closed_right_transform = PLACE_CLOSED_RIGHT.clone();
-    south_place_closed_right_transform.rotate_around(Vec3::ZERO, south_quat);
-
-    let mut west_place_closed_left_transform = PLACE_CLOSED_LEFT.clone();
-    west_place_closed_left_transform.rotate_around(Vec3::ZERO, west_quat);
-    let mut west_place_closed_midleft_transform = PLACE_CLOSED_MIDLEFT.clone();
-    west_place_closed_midleft_transform.rotate_around(Vec3::ZERO, west_quat);
-    let mut west_place_closed_midright_transform = PLACE_CLOSED_MIDRIGHT.clone();
-    west_place_closed_midright_transform.rotate_around(Vec3::ZERO, west_quat);
-    let mut west_place_closed_right_transform = PLACE_CLOSED_RIGHT.clone();
-    west_place_closed_right_transform.rotate_around(Vec3::ZERO, west_quat);
-
-    let north_wall_short_closed_transform = WALL_SHORT_CLOSED.clone();
-    let mut east_wall_short_closed_transform = WALL_SHORT_CLOSED.clone();
-    east_wall_short_closed_transform.rotate_around(Vec3::ZERO, east_quat);
-    let mut south_wall_short_closed_transform = WALL_SHORT_CLOSED.clone();
-    south_wall_short_closed_transform.rotate_around(Vec3::ZERO, south_quat);
-    let mut west_wall_short_closed_transform = WALL_SHORT_CLOSED.clone();
-    west_wall_short_closed_transform.rotate_around(Vec3::ZERO, west_quat);
-
-    /* println!(
-        "Transform: {:?} {:?} {:?} {:?}",
-        north_wall_cube_common_transform,
-        east_wall_cube_common_transform,
-        south_wall_cube_common_transform,
-        west_wall_cube_common_transform
-    ); */
+    println!("{}", TRANSFORM_ARRAY.len());
 
     commands
         .spawn_empty()
         .insert((Transform::default(), Visibility::default()))
         .with_children(|parent| {
-            let mut wall_common_transform = Transform::default();
-            let mut place_common_transform = Transform::default();
-            let mut wall_open_left_transform = Transform::default();
-            let mut wall_open_right_transform = Transform::default();
-            let mut place_closed_left_transform = Transform::default();
-            let mut place_closed_right_transform = Transform::default();
-            let mut place_closed_midleft_transform = Transform::default();
-            let mut place_closed_midright_transform = Transform::default();
-            let mut wall_closed_transform = Transform::default();
-            let mut exit_status = Exit::default();
-
             for z in 0..MAP_HEIGHT {
                 for x in 0..MAP_WIDTH {
                     let z_pos = (z * CELL_HEIGHT) as f32;
@@ -163,95 +100,16 @@ pub fn scene_setup(
                         ))
                         .with_children(|sub_parent| {
                             for direction in 0..4 {
-                                match direction {
-                                    0 => {
-                                        wall_common_transform = north_wall_cube_common_transform;
-                                        place_common_transform = north_place_cube_common_transform;
-                                        wall_open_left_transform =
-                                            north_wall_cube_open_left_transform;
-                                        wall_open_right_transform =
-                                            north_wall_cube_open_right_transform;
-                                        exit_status =
-                                            maze.tiles[maze.idx((x as i32, z as i32).into())].north;
-                                        wall_closed_transform = north_wall_short_closed_transform;
-                                        place_closed_left_transform =
-                                            north_place_closed_left_transform;
-                                        place_closed_midleft_transform =
-                                            north_place_closed_midleft_transform;
-                                        place_closed_midright_transform =
-                                            north_place_closed_midright_transform;
-                                        place_closed_right_transform =
-                                            north_place_closed_right_transform;
-                                    }
-                                    1 => {
-                                        wall_common_transform = east_wall_cube_common_transform;
-                                        place_common_transform = east_place_cube_common_transform;
-                                        wall_open_left_transform =
-                                            east_wall_cube_open_left_transform;
-                                        wall_open_right_transform =
-                                            east_wall_cube_open_right_transform;
-                                        exit_status =
-                                            maze.tiles[maze.idx((x as i32, z as i32).into())].east;
-                                        wall_closed_transform = east_wall_short_closed_transform;
-                                        place_closed_left_transform =
-                                            east_place_closed_left_transform;
-                                        place_closed_midleft_transform =
-                                            east_place_closed_midleft_transform;
-                                        place_closed_midright_transform =
-                                            east_place_closed_midright_transform;
-                                        place_closed_right_transform =
-                                            east_place_closed_right_transform;
-                                    }
-                                    2 => {
-                                        wall_common_transform = south_wall_cube_common_transform;
-                                        place_common_transform = south_place_cube_common_transform;
-                                        wall_open_left_transform =
-                                            south_wall_cube_open_left_transform;
-                                        wall_open_right_transform =
-                                            south_wall_cube_open_right_transform;
-                                        exit_status =
-                                            maze.tiles[maze.idx((x as i32, z as i32).into())].south;
-                                        wall_closed_transform = south_wall_short_closed_transform;
-                                        place_closed_left_transform =
-                                            south_place_closed_left_transform;
-                                        place_closed_midleft_transform =
-                                            south_place_closed_midleft_transform;
-                                        place_closed_midright_transform =
-                                            south_place_closed_midright_transform;
-                                        place_closed_right_transform =
-                                            south_place_closed_right_transform;
-                                    }
-                                    3 => {
-                                        wall_common_transform = west_wall_cube_common_transform;
-                                        place_common_transform = west_place_cube_common_transform;
-                                        wall_open_left_transform =
-                                            west_wall_cube_open_left_transform;
-                                        wall_open_right_transform =
-                                            west_wall_cube_open_right_transform;
-                                        exit_status =
-                                            maze.tiles[maze.idx((x as i32, z as i32).into())].west;
-                                        wall_closed_transform = west_wall_short_closed_transform;
-                                        place_closed_left_transform =
-                                            west_place_closed_left_transform;
-                                        place_closed_midleft_transform =
-                                            west_place_closed_midleft_transform;
-                                        place_closed_midright_transform =
-                                            west_place_closed_midright_transform;
-                                        place_closed_right_transform =
-                                            west_place_closed_right_transform;
-                                    }
-                                    _ => panic!("Shouldn't be here..."),
-                                }
                                 sub_parent.spawn((
                                     Mesh3d(cube_mesh_handle.clone()),
                                     MeshMaterial3d(wall_cube_material_handle.clone()),
-                                    wall_common_transform,
+                                    rotated_transform_array[direction],
                                 ));
                                 sub_parent
                                     .spawn((
                                         Mesh3d(cube_mesh_handle.clone()),
                                         MeshMaterial3d(place_cube_material_handle.clone()),
-                                        place_common_transform,
+                                        rotated_transform_array[direction + 4],
                                     ))
                                     .observe(update_material_on::<Pointer<Over>>(
                                         place_cube_hover_handle.clone(),
@@ -266,17 +124,19 @@ pub fn scene_setup(
                                         place_cube_hover_handle.clone(),
                                     ))
                                     .insert(RayCastPickable);
-                                match exit_status {
+                                match maze.tiles[maze.idx((x as i32, z as i32).into())].exits
+                                    [direction]
+                                {
                                     Exit::Open => {
                                         sub_parent.spawn((
                                             Mesh3d(cube_mesh_handle.clone()),
                                             MeshMaterial3d(wall_cube_material_handle.clone()),
-                                            wall_open_left_transform,
+                                            rotated_transform_array[direction + 8],
                                         ));
                                         sub_parent.spawn((
                                             Mesh3d(cube_mesh_handle.clone()),
                                             MeshMaterial3d(wall_cube_material_handle.clone()),
-                                            wall_open_right_transform,
+                                            rotated_transform_array[direction + 12],
                                         ));
                                     }
                                     Exit::Closed => {
@@ -284,7 +144,7 @@ pub fn scene_setup(
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
                                                 MeshMaterial3d(place_cube_material_handle.clone()),
-                                                place_closed_left_transform,
+                                                rotated_transform_array[direction + 20],
                                             ))
                                             .observe(update_material_on::<Pointer<Over>>(
                                                 place_cube_hover_handle.clone(),
@@ -303,7 +163,7 @@ pub fn scene_setup(
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
                                                 MeshMaterial3d(place_cube_material_handle.clone()),
-                                                place_closed_midleft_transform,
+                                                rotated_transform_array[direction + 24],
                                             ))
                                             .observe(update_material_on::<Pointer<Over>>(
                                                 place_cube_hover_handle.clone(),
@@ -322,7 +182,7 @@ pub fn scene_setup(
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
                                                 MeshMaterial3d(place_cube_material_handle.clone()),
-                                                place_closed_midright_transform,
+                                                rotated_transform_array[direction + 28],
                                             ))
                                             .observe(update_material_on::<Pointer<Over>>(
                                                 place_cube_hover_handle.clone(),
@@ -341,7 +201,7 @@ pub fn scene_setup(
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
                                                 MeshMaterial3d(place_cube_material_handle.clone()),
-                                                place_closed_right_transform,
+                                                rotated_transform_array[direction + 32],
                                             ))
                                             .observe(update_material_on::<Pointer<Over>>(
                                                 place_cube_hover_handle.clone(),
@@ -359,7 +219,7 @@ pub fn scene_setup(
                                         sub_parent.spawn((
                                             Mesh3d(short_wall_mesh_handle.clone()),
                                             MeshMaterial3d(wall_cube_material_handle.clone()),
-                                            wall_closed_transform,
+                                            rotated_transform_array[direction + 16],
                                         ));
                                     }
                                 }

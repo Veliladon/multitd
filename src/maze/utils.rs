@@ -8,13 +8,19 @@ pub enum Exit {
     Closed,
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+/* #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Cell {
     pub north: Exit,
     pub east: Exit,
     pub south: Exit,
     pub west: Exit,
+} */
+
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct Cell {
+    pub exits: [Exit; 4],
 }
+
 #[derive(Debug, Resource)]
 pub struct Maze {
     pub width: i32,

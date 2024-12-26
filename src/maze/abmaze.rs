@@ -40,10 +40,12 @@ impl MazeBuilder for ABMaze {
                 let index = maze.idx(pos);
                 if maze.tiles[new_index].visited() == Visited::NotVisited {
                     visited_count += 1;
-                    match direction {
+                    maze.tiles[new_index].exits[(direction + 2) % 4] = Exit::Open;
+                    maze.tiles[index].exits[direction] = Exit::Open;
+                    /* match direction {
                         0 => {
-                            maze.tiles[new_index].south = Exit::Open;
-                            maze.tiles[index].north = Exit::Open;
+                            maze.tiles[new_index].exits[direction + 2 % 4] = Exit::Open;
+                            maze.tiles[index].exits[direction] = Exit::Open;
                             /* println!(
                                 "Making a hole north. Old Cell: {:#?} New Cell: {:#?}",
                                 maze.tiles[index], maze.tiles[new_index]
@@ -51,7 +53,7 @@ impl MazeBuilder for ABMaze {
                         }
                         1 => {
                             maze.tiles[new_index].west = Exit::Open;
-                            maze.tiles[index].east = Exit::Open;
+                            maze.tiles[index].exits[1] = Exit::Open;
                             /* println!(
                                 "Making a hole east. Old Cell: {:#?} New Cell: {:#?}",
                                 maze.tiles[index], maze.tiles[new_index]
@@ -75,7 +77,7 @@ impl MazeBuilder for ABMaze {
                         }
 
                         _ => panic!("How did you get here? Using loaded dice?"),
-                    }
+                    } */
                 }
                 pos = new_pos;
                 // println!("Position in bounds. Changing Position");
@@ -92,12 +94,12 @@ impl MazeBuilder for ABMaze {
         maze.entry = rng.gen_range(0..width);
         println!("{}", maze.entry);
         let entry_index = maze.idx(IVec2::new(maze.entry, 0));
-        maze.tiles[entry_index].south = Exit::Open;
+        maze.tiles[entry_index].exits[2] = Exit::Open;
 
         maze.exit = rng.gen_range(0..width);
         println!("{}", maze.exit);
         let exit_index = maze.idx(IVec2::new(maze.exit, maze.height - 1));
-        maze.tiles[exit_index].north = Exit::Open;
+        maze.tiles[exit_index].exits[0] = Exit::Open;
 
         maze
     }
@@ -111,10 +113,10 @@ pub enum Visited {
 
 impl Cell {
     pub fn visited(&self) -> Visited {
-        if self.north == Exit::Closed
-            && self.south == Exit::Closed
-            && self.east == Exit::Closed
-            && self.west == Exit::Closed
+        if self.exits[0] == Exit::Closed
+            && self.exits[1] == Exit::Closed
+            && self.exits[2] == Exit::Closed
+            && self.exits[3] == Exit::Closed
         {
             return Visited::NotVisited;
         }
