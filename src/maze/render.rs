@@ -4,6 +4,7 @@ use bevy::color::palettes::tailwind::{CYAN_300, YELLOW_300};
 //use bevy::picking::pointer::PointerInteraction;
 
 use crate::prelude::*;
+// use rand_chacha::*;
 
 #[derive(Component)]
 struct Ground;
@@ -35,6 +36,7 @@ pub const TRANSFORM_ARRAY: [Transform; 9] = [
 
 pub fn generate_maze(mut commands: Commands) {
     let rng = thread_rng();
+
     let maze = Maze::new(6, 6, rng);
     commands.insert_resource(maze);
 }
@@ -72,9 +74,9 @@ pub fn scene_setup(
         })
         .collect();
 
-    println!("{:#?}", rotated_transform_array);
+    // println!("{:#?}", rotated_transform_array);
 
-    println!("{}", TRANSFORM_ARRAY.len());
+    //println!("{}", TRANSFORM_ARRAY.len());
 
     commands
         .spawn_empty()

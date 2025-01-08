@@ -20,6 +20,32 @@ pub struct Cell {
 pub struct Cell {
     pub exits: [Exit; 4],
 }
+#[derive(Debug, Copy, Clone)]
+pub enum Direction {
+    North = 0,
+    East = 1,
+    South = 2,
+    West = 3,
+}
+
+pub const NORTH: usize = Direction::North as usize;
+pub const EAST: usize = Direction::East as usize;
+pub const SOUTH: usize = Direction::South as usize;
+pub const WEST: usize = Direction::West as usize;
+
+impl TryFrom<usize> for Direction {
+    type Error = ();
+
+    fn try_from(direction: usize) -> Result<Self, Self::Error> {
+        match direction {
+            NORTH => Ok(Direction::North),
+            EAST => Ok(Direction::East),
+            SOUTH => Ok(Direction::South),
+            WEST => Ok(Direction::West),
+            _ => Err(()),
+        }
+    }
+}
 
 #[derive(Debug, Resource)]
 pub struct Maze {
@@ -36,15 +62,17 @@ pub trait MazeBuilder {
 
 #[derive(Debug)]
 pub struct MazeCorridor {
-    start: (i32, i32),           // Starting position of the corridor
-    path: Vec<(i32, i32)>,       // Linear path through the corridor
-    children: Vec<MazeCorridor>, // Corridors branching out from the end
+    start: (i32, i32),
+    entrance_direction: Direction, // Starting position of the corridor
+    path: Vec<(i32, i32)>,         // Linear path through the corridor
+    children: Vec<MazeCorridor>,   // Corridors branching out from the end
 }
 
 impl MazeCorridor {
-    pub fn new(start: (i32, i32)) -> Self {
+    pub fn new(start: (i32, i32), entrance_direction: Direction) -> Self {
         MazeCorridor {
             start,
+            entrance_direction,
             path: Vec::new(),
             children: Vec::new(),
         }
@@ -55,15 +83,15 @@ impl MazeCorridor {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct MazeCorridorTree {
     root: MazeCorridor,
 }
 
 impl MazeCorridorTree {
-    pub fn new(start_position: (i32, i32)) -> Self {
+    pub fn new(start_position: (i32, i32), entrance_direction: Direction) -> Self {
         MazeCorridorTree {
-            root: MazeCorridor::new(start_position),
+            root: MazeCorridor::new(start_position, entrance_direction),
         }
     }
 
@@ -108,13 +136,13 @@ impl Maze {
             && (pos.y < (self.height as i32))
     }
 
-    pub fn num_exits(&self, pos: IVec2) -> usize {
-        let mut exit_count = 0;
+    pub fn exits(&self, pos: IVec2) -> [Option<Direction>; 4] {
+        let mut exits = [None; 4];
         for direction in 0..4 {
             if self.tiles[self.idx(pos)].exits[direction] == Exit::Open {
-                exit_count += 1;
+                exits[direction] = Some(direction.try_into().unwrap());
             }
         }
-        exit_count
+        exits
     }
 }

@@ -24,6 +24,7 @@ mod prelude {
 
 use bevy::{
     dev_tools::fps_overlay::{FpsOverlayConfig, FpsOverlayPlugin},
+    remote::{http::RemoteHttpPlugin, RemotePlugin},
     text::FontSmoothing,
 };
 use prelude::*;
@@ -64,5 +65,9 @@ fn main() {
         .add_plugins(EnemyPlugin)
         .add_plugins(SelectorPlugin)
         .add_plugins(ConfigPlugin)
+        // .add_plugins(DiagnosticsExplorerPlugin)
+        // .disable::<LogPlugin>()
+        .add_plugins(RemotePlugin::default())
+        .add_plugins(RemoteHttpPlugin::default())
         .run();
 }
