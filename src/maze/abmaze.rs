@@ -26,12 +26,12 @@ impl MazeBuilder for ABMaze {
         let mut visited_count: i32 = 1;
 
         let mut pos = IVec2::new(
-            rng.gen_range(0..width) as i32,
-            rng.gen_range(0..height) as i32,
+            rng.random_range(0..width) as i32,
+            rng.random_range(0..height) as i32,
         );
 
         while visited_count < (width * height) {
-            let direction = rng.gen_range(0..4);
+            let direction = rng.random_range(0..4);
             // println!("Picked {} on the 1d4 direction", direction);
             let new_pos = pos + DIRECTIONS[direction];
             // println!("I'm at... {:#?} and trying {:#?}", pos, new_pos);
@@ -91,12 +91,12 @@ impl MazeBuilder for ABMaze {
             ); */
         }
         // println!("{:#?}", maze);
-        maze.entry = rng.gen_range(0..width);
+        maze.entry = rng.random_range(0..width);
         println!("{}", maze.entry);
         let entry_index = maze.idx(IVec2::new(maze.entry, 0));
         maze.tiles[entry_index].exits[2] = Exit::Open;
 
-        maze.exit = rng.gen_range(0..width);
+        maze.exit = rng.random_range(0..width);
         println!("{}", maze.exit);
         let exit_index = maze.idx(IVec2::new(maze.exit, maze.height - 1));
         maze.tiles[exit_index].exits[0] = Exit::Open;

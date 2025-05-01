@@ -1,6 +1,10 @@
+use rand::rng;
 use std::f32::consts::TAU;
 
-use bevy::color::palettes::tailwind::{CYAN_300, YELLOW_300};
+use bevy::{
+    color::palettes::tailwind::{CYAN_300, YELLOW_300},
+    // log::tracing_subscriber::util::SubscriberInitExt,
+};
 //use bevy::picking::pointer::PointerInteraction;
 
 use crate::prelude::*;
@@ -35,7 +39,7 @@ pub const TRANSFORM_ARRAY: [Transform; 9] = [
 ];
 
 pub fn generate_maze(mut commands: Commands) {
-    let rng = thread_rng();
+    let rng = rng();
 
     let maze = Maze::new(6, 6, rng);
     commands.insert_resource(maze);
@@ -119,13 +123,13 @@ pub fn scene_setup(
                                     .observe(update_material_on::<Pointer<Out>>(
                                         place_cube_material_handle.clone(),
                                     ))
-                                    .observe(update_material_on::<Pointer<Down>>(
+                                    .observe(update_material_on::<Pointer<Pressed>>(
                                         place_cube_pressed_handle.clone(),
                                     ))
-                                    .observe(update_material_on::<Pointer<Up>>(
+                                    .observe(update_material_on::<Pointer<Released>>(
                                         place_cube_hover_handle.clone(),
                                     ))
-                                    .insert(RayCastPickable);
+                                    .insert(Pickable::default());
                                 match maze.tiles[maze.idx((x as i32, z as i32).into())].exits
                                     [direction]
                                 {
@@ -154,13 +158,13 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Down>>(
+                                            .observe(update_material_on::<Pointer<Pressed>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Up>>(
+                                            .observe(update_material_on::<Pointer<Released>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
-                                            .insert(RayCastPickable);
+                                            .insert(Pickable::default());
                                         sub_parent
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
@@ -173,13 +177,13 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Down>>(
+                                            .observe(update_material_on::<Pointer<Pressed>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Up>>(
+                                            .observe(update_material_on::<Pointer<Released>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
-                                            .insert(RayCastPickable);
+                                            .insert(Pickable::default());
                                         sub_parent
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
@@ -192,13 +196,13 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Down>>(
+                                            .observe(update_material_on::<Pointer<Pressed>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Up>>(
+                                            .observe(update_material_on::<Pointer<Released>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
-                                            .insert(RayCastPickable);
+                                            .insert(Pickable::default());
                                         sub_parent
                                             .spawn((
                                                 Mesh3d(cube_mesh_handle.clone()),
@@ -211,13 +215,13 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Down>>(
+                                            .observe(update_material_on::<Pointer<Pressed>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Up>>(
+                                            .observe(update_material_on::<Pointer<Released>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
-                                            .insert(RayCastPickable);
+                                            .insert(Pickable::default());
                                         sub_parent.spawn((
                                             Mesh3d(short_wall_mesh_handle.clone()),
                                             MeshMaterial3d(wall_cube_material_handle.clone()),
@@ -236,7 +240,7 @@ fn update_material_on<E>(
     new_material: Handle<StandardMaterial>,
 ) -> impl Fn(Trigger<E>, Query<&mut MeshMaterial3d<StandardMaterial>>) {
     move |trigger, mut query| {
-        if let Ok(mut material) = query.get_mut(trigger.entity()) {
+        if let Ok(mut material) = query.get_mut(trigger.target()) {
             material.0 = new_material.clone();
         }
     }

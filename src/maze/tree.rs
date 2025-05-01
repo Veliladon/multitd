@@ -1,6 +1,6 @@
 use crate::*;
 
-pub fn generate_tree(maze: Res<Maze>, mut commands: Commands) {
+pub fn generate_tree(maze: Res<Maze>, commands: Commands) {
     let mut prev_position = (maze.entry, -1);
     let mut position = (maze.entry, 0);
 
