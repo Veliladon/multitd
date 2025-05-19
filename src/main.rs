@@ -3,7 +3,7 @@ mod assets;
 mod camera;
 mod config;
 mod enemy;
-// mod input;
+mod input;
 mod maze;
 mod selector;
 mod utils;
@@ -14,7 +14,7 @@ mod prelude {
     pub use crate::camera::*;
     pub use crate::config::*;
     pub use crate::enemy::*;
-    // pub use crate::input::*;
+    pub use crate::input::*;
     pub use crate::maze::*;
     pub use crate::selector::*;
     pub use bevy::prelude::*;
@@ -60,7 +60,7 @@ fn main() {
             ..default()
         }) */
         .add_plugins(MeshPickingPlugin)
-        // .add_plugins(ProcessInputPlugin)
+        .add_plugins(ProcessInputPlugin)
         .add_plugins(AssetLoadingPlugin)
         .add_plugins(CameraSetupPlugin)
         .add_plugins(MazePlugin)
