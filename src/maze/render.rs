@@ -123,10 +123,10 @@ pub fn scene_setup(
                                     .observe(update_material_on::<Pointer<Out>>(
                                         place_cube_material_handle.clone(),
                                     ))
-                                    .observe(update_material_on::<Pointer<Pressed>>(
+                                    .observe(update_material_on::<Pointer<Click>>(
                                         place_cube_pressed_handle.clone(),
                                     ))
-                                    .observe(update_material_on::<Pointer<Released>>(
+                                    .observe(update_material_on::<Pointer<Click>>(
                                         place_cube_hover_handle.clone(),
                                     ))
                                     .insert(Pickable::default());
@@ -158,10 +158,10 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Pressed>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Released>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
                                             .insert(Pickable::default());
@@ -177,10 +177,10 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Pressed>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Released>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
                                             .insert(Pickable::default());
@@ -196,10 +196,10 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Pressed>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Released>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
                                             .insert(Pickable::default());
@@ -215,10 +215,10 @@ pub fn scene_setup(
                                             .observe(update_material_on::<Pointer<Out>>(
                                                 place_cube_material_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Pressed>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_pressed_handle.clone(),
                                             ))
-                                            .observe(update_material_on::<Pointer<Released>>(
+                                            .observe(update_material_on::<Pointer<Click>>(
                                                 place_cube_hover_handle.clone(),
                                             ))
                                             .insert(Pickable::default());
@@ -236,11 +236,11 @@ pub fn scene_setup(
         });
 }
 
-fn update_material_on<E>(
+fn update_material_on<E: EntityEvent>(
     new_material: Handle<StandardMaterial>,
-) -> impl Fn(Trigger<E>, Query<&mut MeshMaterial3d<StandardMaterial>>) {
-    move |trigger, mut query| {
-        if let Ok(mut material) = query.get_mut(trigger.target()) {
+) -> impl Fn(On<E>, Query<&mut MeshMaterial3d<StandardMaterial>>) {
+    move |event, mut query| {
+        if let Ok(mut material) = query.get_mut(event.event_target()) {
             material.0 = new_material.clone();
         }
     }
