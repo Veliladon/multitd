@@ -228,6 +228,8 @@ pub fn scene_setup(
                                             rotated_transform_array[direction + 16],
                                         ));
                                     }
+                                    Exit::Start => {}
+                                    Exit::Finish => {}
                                 }
                             }
                         });

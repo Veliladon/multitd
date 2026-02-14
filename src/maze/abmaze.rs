@@ -42,47 +42,9 @@ impl MazeBuilder for ABMaze {
                     visited_count += 1;
                     maze.tiles[new_index].exits[(direction + 2) % 4] = Exit::Open;
                     maze.tiles[index].exits[direction] = Exit::Open;
-                    /* match direction {
-                        0 => {
-                            maze.tiles[new_index].exits[direction + 2 % 4] = Exit::Open;
-                            maze.tiles[index].exits[direction] = Exit::Open;
-                            /* println!(
-                                "Making a hole north. Old Cell: {:#?} New Cell: {:#?}",
-                                maze.tiles[index], maze.tiles[new_index]
-                            ) */
-                        }
-                        1 => {
-                            maze.tiles[new_index].west = Exit::Open;
-                            maze.tiles[index].exits[1] = Exit::Open;
-                            /* println!(
-                                "Making a hole east. Old Cell: {:#?} New Cell: {:#?}",
-                                maze.tiles[index], maze.tiles[new_index]
-                            ) */
-                        }
-                        2 => {
-                            maze.tiles[new_index].north = Exit::Open;
-                            maze.tiles[index].south = Exit::Open;
-                            /* println!(
-                                "Making a hole south. Old Cell: {:#?} New Cell: {:#?}",
-                                maze.tiles[index], maze.tiles[new_index]
-                            ) */
-                        }
-                        3 => {
-                            maze.tiles[new_index].east = Exit::Open;
-                            maze.tiles[index].west = Exit::Open;
-                            /* println!(
-                                "Making a hole west. Old Cell: {:#?} New Cell: {:#?}",
-                                maze.tiles[index], maze.tiles[new_index]
-                            ) */
-                        }
-
-                        _ => panic!("How did you get here? Using loaded dice?"),
-                    } */
                 }
                 pos = new_pos;
-                // println!("Position in bounds. Changing Position");
             } else {
-                // println!("Staying here because the destination isn't in bounds");
             }
 
             /* println!(
@@ -94,12 +56,12 @@ impl MazeBuilder for ABMaze {
         maze.entry = rng.random_range(0..width);
         println!("{}", maze.entry);
         let entry_index = maze.idx(IVec2::new(maze.entry, 0));
-        maze.tiles[entry_index].exits[2] = Exit::Open;
+        maze.tiles[entry_index].exits[2] = Exit::Start;
 
         maze.exit = rng.random_range(0..width);
         println!("{}", maze.exit);
         let exit_index = maze.idx(IVec2::new(maze.exit, maze.height - 1));
-        maze.tiles[exit_index].exits[0] = Exit::Open;
+        maze.tiles[exit_index].exits[0] = Exit::Finish;
 
         maze
     }
