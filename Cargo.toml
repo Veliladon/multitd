@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 
-bevy = { version = "0.18.0", features = [
+bevy = { version = "0.18.1", features = [
     "bevy_dev_tools",
     "bevy_remote",
     "trace",
@@ -14,7 +14,7 @@ bevy-inspector-egui = "0.36.0"
 leafwing-input-manager = "0.20.0"
 rand = "0.10.0"
 rand_chacha = "0.10.0"
-simple-easing = "1.0.1"
+simple-easing = "1.0.2"
 
 
 [profile.dev.package."*"]
