@@ -1,9 +1,7 @@
 use rand::prelude::*;
 
-use super::{Maze, MazeBuilder};
+use super::Maze;
 use crate::*;
-
-pub struct ABMaze;
 
 const DIRECTIONS: [IVec2; 4] = [
     IVec2 { x: 0, y: 1 },
@@ -12,8 +10,18 @@ const DIRECTIONS: [IVec2; 4] = [
     IVec2 { x: -1, y: 0 },
 ];
 
-impl MazeBuilder for ABMaze {
-    fn new(width: i32, height: i32, mut rng: ThreadRng) -> Maze {
+impl Maze {
+    pub fn idx(&self, pos: IVec2) -> usize {
+        ((pos.y * (self.width as i32)) + pos.x) as usize
+    }
+
+    pub fn in_bounds(&self, pos: IVec2) -> bool {
+        (pos.x >= 0)
+            && (pos.x < (self.width as i32))
+            && (pos.y >= 0)
+            && (pos.y < (self.height as i32))
+    }
+    pub fn new(width: i32, height: i32, mut rng: ThreadRng) -> Maze {
         let mut maze = Maze {
             width,
             height,
@@ -22,7 +30,6 @@ impl MazeBuilder for ABMaze {
             exit: 0,
         };
 
-        /* let visited_list = vec![Visited::default(); width * height]; */
         let mut visited_count: i32 = 1;
 
         let mut pos = IVec2::new(
@@ -32,7 +39,7 @@ impl MazeBuilder for ABMaze {
 
         while visited_count < (width * height) {
             let direction = rng.random_range(0..4);
-            // println!("Picked {} on the 1d4 direction", direction);
+            info!("Picked {} on the 1d4 direction", direction);
             let new_pos = pos + DIRECTIONS[direction];
             // println!("I'm at... {:#?} and trying {:#?}", pos, new_pos);
             let new_index = maze.idx(new_pos);
@@ -46,13 +53,8 @@ impl MazeBuilder for ABMaze {
                 pos = new_pos;
             } else {
             }
-
-            /* println!(
-                "Starting from  {:#?} next. Visited {} tiles",
-                pos, visited_count
-            ); */
         }
-        // println!("{:#?}", maze);
+
         maze.entry = rng.random_range(0..width);
         println!("{}", maze.entry);
         let entry_index = maze.idx(IVec2::new(maze.entry, 0));
@@ -64,6 +66,23 @@ impl MazeBuilder for ABMaze {
         maze.tiles[exit_index].exits[0] = Exit::Finish;
 
         maze
+    }
+}
+
+impl MazeGraph {
+    pub fn from_maze(maze: &Maze) -> Self {
+        let size = (maze.width * maze.height) as usize;
+        let mut nodes = vec![[None; 4]; size]; // Layout is N/E/S/W
+
+        for (index, tile) in maze.tiles.iter().enumerate() {
+            for (dir, offset) in DIRECTIONS.iter().enumerate() {
+                if tile.exits[dir] == Exit::Open {
+                    nodes[index][dir] =
+                        Some((index as i32 + offset.y * maze.width + offset.x) as usize);
+                }
+            }
+        }
+        MazeGraph { nodes }
     }
 }
 
@@ -85,7 +104,3 @@ impl Cell {
         Visited::Visited
     }
 }
-
-/* pub fn check_visited(visited: &VecVisisted, index: usize) -> Visited {
-    Visited::NotVisited
-} */

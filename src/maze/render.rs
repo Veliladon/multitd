@@ -3,6 +3,7 @@ use std::f32::consts::TAU;
 
 use bevy::{
     color::palettes::tailwind::{CYAN_300, YELLOW_300},
+    log::tracing_subscriber::field::debug,
     // log::tracing_subscriber::util::SubscriberInitExt,
 };
 //use bevy::picking::pointer::PointerInteraction;
@@ -42,7 +43,10 @@ pub fn generate_maze(mut commands: Commands) {
     let rng = rng();
 
     let maze = Maze::new(6, 6, rng);
+    let maze_graph = MazeGraph::from_maze(&maze);
     commands.insert_resource(maze);
+    print!("{:?}", maze_graph);
+    commands.insert_resource(maze_graph);
 }
 
 pub fn scene_setup(

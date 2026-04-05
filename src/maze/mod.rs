@@ -1,9 +1,9 @@
 mod abmaze;
+
 mod render;
 
 mod utils;
 
-pub use abmaze::*;
 pub use rand::prelude::*;
 
 pub use render::*;
