@@ -78,7 +78,7 @@ impl MazeGraph {
             for (dir, offset) in DIRECTIONS.iter().enumerate() {
                 if tile.exits[dir] == Exit::Open {
                     nodes[index][dir] =
-                        Some((index as i32 + offset.y * maze.width + offset.x) as usize);
+                        Some((index as i32 + (offset.x) + (offset.y * maze.width)) as usize)
                 }
             }
         }

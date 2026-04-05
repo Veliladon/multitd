@@ -45,7 +45,7 @@ pub fn generate_maze(mut commands: Commands) {
     let maze = Maze::new(6, 6, rng);
     let maze_graph = MazeGraph::from_maze(&maze);
     commands.insert_resource(maze);
-    print!("{:?}", maze_graph);
+    dbg!("{:?}", &maze_graph.nodes);
     commands.insert_resource(maze_graph);
 }
 
