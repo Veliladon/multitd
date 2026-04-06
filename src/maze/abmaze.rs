@@ -21,6 +21,22 @@ impl Maze {
             && (pos.y >= 0)
             && (pos.y < (self.height as i32))
     }
+
+    pub fn is_exit(&self, pos: IVec2) -> bool {
+        {
+            self.tiles[self.idx(pos)].exits[0] == Exit::Finish
+                || self.tiles[self.idx(pos)].exits[1] == Exit::Finish
+                || self.tiles[self.idx(pos)].exits[2] == Exit::Finish
+                || self.tiles[self.idx(pos)].exits[3] == Exit::Finish
+        }
+    }
+
+    pub fn find_exit(&self) -> MazeRoute {
+        let nodes = Vec::new();
+
+        MazeRoute { nodes }
+    }
+
     pub fn new(width: i32, height: i32, mut rng: ThreadRng) -> Maze {
         let mut maze = Maze {
             width,

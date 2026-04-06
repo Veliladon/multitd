@@ -35,3 +35,7 @@ pub struct Maze {
 pub struct MazeGraph {
     pub nodes: Vec<[Option<usize>; 4]>,
 }
+
+pub struct MazeRoute {
+    pub nodes: Vec<usize>,
+}
