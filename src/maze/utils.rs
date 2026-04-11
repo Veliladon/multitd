@@ -36,6 +36,10 @@ pub struct MazeGraph {
     pub nodes: Vec<[Option<usize>; 4]>,
 }
 
+#[derive(Debug, Resource)]
 pub struct MazeRoute {
     pub nodes: Vec<usize>,
 }
+
+#[derive(Resource, Deref, DerefMut)]
+pub struct MazeEntityMap(pub Vec<Entity>);

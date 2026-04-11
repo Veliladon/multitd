@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use rand::prelude::*;
 
 use super::Maze;
@@ -29,12 +31,6 @@ impl Maze {
                 || self.tiles[self.idx(pos)].exits[2] == Exit::Finish
                 || self.tiles[self.idx(pos)].exits[3] == Exit::Finish
         }
-    }
-
-    pub fn find_exit(&self) -> MazeRoute {
-        let nodes = Vec::new();
-
-        MazeRoute { nodes }
     }
 
     pub fn new(width: i32, height: i32, mut rng: ThreadRng) -> Maze {
@@ -83,6 +79,41 @@ impl Maze {
 
         maze
     }
+}
+
+pub fn find_exit(maze: &Maze, mazegraph: &MazeGraph) -> MazeRoute {
+    let size = (maze.width * maze.height) as usize;
+    let mut queue = VecDeque::new();
+
+    let entry = maze.idx(IVec2 {
+        x: maze.entry,
+        y: 0,
+    });
+
+    queue.push_back(entry);
+    let mut cells = vec![false; size];
+    let mut parents = vec![usize::MAX; size];
+    let exit = maze.idx(IVec2::new(maze.exit, maze.height - 1));
+    let mut nodes = Vec::new();
+    cells[entry] = true;
+
+    while let Some(cell) = queue.pop_front().filter(|&c| c != exit) {
+        for neighbor in mazegraph.nodes[cell].iter().flatten() {
+            if !cells[*neighbor] {
+                cells[*neighbor] = true;
+                parents[*neighbor] = cell;
+                queue.push_back(*neighbor);
+            }
+        }
+    }
+    let mut current = exit;
+    while current != usize::MAX {
+        nodes.push(current);
+        current = parents[current]
+    }
+    nodes.reverse();
+
+    MazeRoute { nodes }
 }
 
 impl MazeGraph {
