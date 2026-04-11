@@ -35,23 +35,27 @@ pub fn spawn_enemy(
     enemy_mesh_handles: Res<EnemyMeshHandle>,
     mut commands: Commands,
     enemy_path: Res<MazeRoute>,
+    entity_map: Res<MazeEntityMap>,
 ) {
     let start_grid_index = enemy_path.nodes[0];
+    let first_destination_index = enemy_path.nodes[1];
     for mut spawner in &mut spawner_query {
         spawner.timer.tick(time.delta());
         if spawner.timer.just_finished() && spawner.counter > 0 {
             commands
-                .spawn_empty()
-                .insert((Transform::from_xyz(0., 0.35, 3.0), Visibility::default()))
-                .insert(Mobile {
-                    destination: 10,
-                    speed: 2.,
-                })
-                .insert((
-                    Mesh3d(enemy_mesh_handles.cube_mesh_handle.clone()),
-                    MeshMaterial3d(enemy_mesh_handles.cube_material_handle.clone()),
-                ));
-            spawner.counter -= 1;
+                .entity(entity_map[start_grid_index])
+                .with_children(|sub_parent| {
+                    sub_parent.spawn_empty().insert((
+                        Transform::from_xyz(0., 0.35, -3.),
+                        Visibility::default(),
+                        Mesh3d(enemy_mesh_handles.cube_mesh_handle.clone()),
+                        MeshMaterial3d(enemy_mesh_handles.cube_material_handle.clone()),
+                        Mobile {
+                            speed: 2.,
+                            destination: first_destination_index,
+                        },
+                    ));
+                });
         }
     }
 }

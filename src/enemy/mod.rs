@@ -1,10 +1,13 @@
 use crate::prelude::*;
 
+mod movement;
 mod spawn;
 mod utils;
 
 pub use bevy::time::Time;
+pub use movement::*;
 pub use spawn::*;
+pub use utils::*;
 
 pub struct EnemyPlugin;
 
