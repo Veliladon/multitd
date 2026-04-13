@@ -19,6 +19,7 @@ mod prelude {
     pub use crate::input::*;
     pub use crate::maze::*;
     pub use crate::selector::*;
+    pub use crate::utils::*;
     pub use bevy::prelude::*;
     // pub use crate::utils::*;
     pub use bevy::log::LogPlugin;

@@ -53,6 +53,7 @@ pub fn spawn_enemy(
                         Mobile {
                             speed: 2.,
                             destination: first_destination_index,
+                            direction: crate::utils::DIRECTIONS[0],
                         },
                     ));
                 });

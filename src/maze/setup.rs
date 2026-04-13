@@ -39,15 +39,16 @@ pub const TRANSFORM_ARRAY: [Transform; 9] = [
 ];
 
 pub fn generate_maze(mut commands: Commands) {
-    let rng = rng();
+    let maze = Maze::new_hilbert(6, 6);
 
-    let maze = Maze::new(6, 6, rng);
     let maze_graph = MazeGraph::from_maze(&maze);
-    let maze_path = find_exit(&maze, &maze_graph);
 
-    dbg!("{:?}", &maze_graph.nodes);
-    dbg!("{:?}", &maze.is_exit(IVec2::new(maze.exit, 5)));
-    dbg!("{:?}", &maze_path.nodes);
+    for (i, node) in maze_graph.nodes.iter().enumerate() {
+        println!("node {}: {:?}", i, node);
+    }
+    println!("entry: {}, exit: {}", maze.entry_index, maze.exit_index);
+
+    let maze_path = find_exit(&maze, &maze_graph);
     commands.insert_resource(maze);
     commands.insert_resource(maze_graph);
     commands.insert_resource(maze_path);
@@ -59,10 +60,8 @@ pub fn generate_maze_entities(mut commands: Commands) {
         .spawn_empty()
         .insert((Transform::default(), Visibility::default()))
         .with_children(|parent| {
-            for z in 0..MAP_HEIGHT {
-                for x in 0..MAP_WIDTH {
-                    let z_pos = (z * CELL_HEIGHT) as f32;
-                    let x_pos = (x * CELL_WIDTH) as f32;
+            for _z in 0..MAP_HEIGHT {
+                for _x in 0..MAP_WIDTH {
                     let id = parent.spawn_empty().id();
                     maze_entity_map.push(id);
                 }

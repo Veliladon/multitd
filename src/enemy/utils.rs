@@ -16,4 +16,5 @@ pub struct EnemyMeshHandle {
 pub struct Mobile {
     pub speed: f32,
     pub destination: usize,
+    pub direction: IVec2,
 }

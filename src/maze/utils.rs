@@ -26,8 +26,8 @@ pub struct Cell {
 pub struct Maze {
     pub width: i32,
     pub height: i32,
-    pub entry: i32,
-    pub exit: i32,
+    pub entry_index: usize,
+    pub exit_index: usize,
     pub tiles: Vec<Cell>,
 }
 
