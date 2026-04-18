@@ -1,4 +1,5 @@
 pub use crate::prelude::*;
+pub use crate::utils::Direction;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub enum Exit {
@@ -31,6 +32,8 @@ pub struct MazeGraph {
 #[derive(Debug, Resource)]
 pub struct MazeRoute {
     pub nodes: Vec<usize>,
+    pub entry_direction: Direction,
+    pub exit_direction: Direction,
 }
 
 #[derive(Resource, Deref, DerefMut)]

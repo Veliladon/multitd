@@ -9,7 +9,7 @@ use super::utils::EnemySpawner;
 pub fn construct_spawners(mut commands: Commands) {
     commands.spawn(EnemySpawner {
         timer: Timer::new(Duration::from_secs_f32(2.0), TimerMode::Repeating),
-        counter: 10,
+        counter: 1,
     });
 }
 
@@ -55,7 +55,7 @@ pub fn spawn_enemy(
                             speed: 5.,
                             destination: start_grid_index,
                             direction: crate::utils::DIRECTIONS[0],
-                            index: 0,
+                            index: 1,
                         },
                         FollowsLane { 0: 1 },
                     ));

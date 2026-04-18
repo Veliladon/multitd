@@ -22,3 +22,6 @@ pub struct Mobile {
 
 #[derive(Component, DerefMut, Deref)]
 pub struct FollowsLane(pub usize);
+
+#[derive(Component)]
+pub struct ReachedGoal;

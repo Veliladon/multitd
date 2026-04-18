@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use rand::prelude::*;
 
 use super::Maze;
-use crate::*;
+use crate::prelude::*;
 
 pub const HILBERT: [usize; 36] = [
     0, 1, 2, 8, 7, 6, 12, 13, 14, 15, 9, 3, 4, 5, 11, 10, 16, 17, 23, 22, 28, 29, 35, 34, 33, 27,
@@ -143,7 +143,11 @@ pub fn find_exit(maze: &Maze, mazegraph: &MazeGraph) -> MazeRoute {
                 current = parents[current];
             }
             nodes.reverse();
-            return MazeRoute { nodes };
+            return MazeRoute {
+                nodes,
+                entry_direction: Direction::South,
+                exit_direction: Direction::North,
+            };
         }
         for neighbor in mazegraph.nodes[cell].iter().flatten() {
             if !cells[*neighbor] {
@@ -154,7 +158,11 @@ pub fn find_exit(maze: &Maze, mazegraph: &MazeGraph) -> MazeRoute {
         }
     }
 
-    MazeRoute { nodes }
+    MazeRoute {
+        nodes,
+        entry_direction: Direction::South,
+        exit_direction: Direction::North,
+    }
 }
 
 impl MazeGraph {

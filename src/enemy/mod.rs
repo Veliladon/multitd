@@ -1,5 +1,3 @@
-use crate::prelude::*;
-
 mod movement;
 mod spawn;
 mod utils;
