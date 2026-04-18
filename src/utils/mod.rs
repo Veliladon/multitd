@@ -1,6 +1,6 @@
 use crate::*;
 
-pub enum Direction {
+/* pub enum Direction {
     North,
     East,
     South,
@@ -25,7 +25,7 @@ impl Direction {
             Direction::West => Direction::East,
         }
     }
-}
+} */
 
 pub const DIRECTIONS: [IVec2; 4] = [
     IVec2 { x: 0, y: 1 },

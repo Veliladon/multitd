@@ -17,4 +17,8 @@ pub struct Mobile {
     pub speed: f32,
     pub destination: usize,
     pub direction: IVec2,
+    pub index: usize,
 }
+
+#[derive(Component, DerefMut, Deref)]
+pub struct FollowsLane(pub usize);

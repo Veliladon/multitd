@@ -38,10 +38,11 @@ pub fn spawn_enemy(
     entity_map: Res<MazeEntityMap>,
 ) {
     let start_grid_index = enemy_path.nodes[0];
-    let first_destination_index = enemy_path.nodes[1];
+    //let first_destination_index = enemy_path.nodes[1];
     for mut spawner in &mut spawner_query {
         spawner.timer.tick(time.delta());
         if spawner.timer.just_finished() && spawner.counter > 0 {
+            spawner.counter -= 1;
             commands
                 .entity(entity_map[start_grid_index])
                 .with_children(|sub_parent| {
@@ -51,10 +52,12 @@ pub fn spawn_enemy(
                         Mesh3d(enemy_mesh_handles.cube_mesh_handle.clone()),
                         MeshMaterial3d(enemy_mesh_handles.cube_material_handle.clone()),
                         Mobile {
-                            speed: 2.,
-                            destination: first_destination_index,
+                            speed: 5.,
+                            destination: start_grid_index,
                             direction: crate::utils::DIRECTIONS[0],
+                            index: 0,
                         },
+                        FollowsLane { 0: 1 },
                     ));
                 });
         }

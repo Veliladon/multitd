@@ -39,8 +39,8 @@ fn main() {
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(LogPlugin {
-                    level: bevy::log::Level::INFO,
-                    filter: "info,wgpu_core=warn,wgpu_hal=warn".into(),
+                    level: bevy::log::Level::DEBUG,
+                    filter: "info,wgpu_core=warn,wgpu_hal=warn,enemy=debug".into(),
                     custom_layer: |_| None,
                     ..Default::default()
                 }),
