@@ -93,6 +93,7 @@ impl Maze {
             let a = pair[0];
             let b = pair[1];
             let difference = b as i32 - a as i32;
+
             match difference {
                 -6 => {
                     maze.tiles[a].exits[2] = Exit::Open;

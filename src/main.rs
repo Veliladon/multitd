@@ -8,6 +8,7 @@ mod enemy;
 mod input;
 mod maze;
 mod selector;
+mod tower;
 mod utils;
 
 mod prelude {
@@ -19,6 +20,7 @@ mod prelude {
     pub use crate::input::*;
     pub use crate::maze::*;
     pub use crate::selector::*;
+    pub use crate::tower::*;
     pub use crate::utils::*;
     pub use bevy::prelude::*;
     // pub use crate::utils::*;
@@ -71,6 +73,7 @@ fn main() {
         .add_plugins(EnemyPlugin)
         .add_plugins(SelectorPlugin)
         .add_plugins(ConfigPlugin)
+        .add_plugins(TowerPlugin)
         // .add_plugins(DiagnosticsExplorerPlugin)
         // .disable::<LogPlugin>()
         .add_plugins(RemotePlugin::default())

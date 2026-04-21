@@ -10,11 +10,6 @@ pub use setup::*;
 
 pub use utils::*;
 
-pub const MAP_HEIGHT: usize = 6;
-pub const MAP_WIDTH: usize = 6;
-pub const CELL_HEIGHT: usize = 6;
-pub const CELL_WIDTH: usize = 6;
-
 pub struct MazePlugin;
 
 impl Plugin for MazePlugin {

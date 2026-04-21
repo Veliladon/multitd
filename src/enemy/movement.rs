@@ -72,10 +72,10 @@ pub fn move_enemy(
             }
         }
 
-        if new_translation.x > 3.0
-            || new_translation.y > 3.0
-            || new_translation.x < -3.0
-            || new_translation.y < -3.0
+        if new_translation.x > (CELL_WIDTH / 2.)
+            || new_translation.y > (CELL_HEIGHT / 2.)
+            || new_translation.x < (-CELL_WIDTH / 2.)
+            || new_translation.y < (-CELL_HEIGHT / 2.)
         {
             if mobile.index >= route.nodes.len() {
                 commands.entity(entity).insert(ReachedGoal);
