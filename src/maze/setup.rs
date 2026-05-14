@@ -7,7 +7,7 @@ use bevy::{
 };
 //use bevy::picking::pointer::PointerInteraction;
 
-use crate::{maze::abmaze::find_exit, prelude::*};
+use crate::{maze::abmaze::find_exit, prelude::*, tower::setup::*};
 // use rand_chacha::*;
 
 #[derive(Component)]
@@ -98,6 +98,8 @@ pub fn scene_setup(
         short_wall_mesh_handle,
     };
 
+    commands.insert_resource(tile_materials.clone());
+
     let quaternion_array = [
         Quat::from_axis_angle(Vec3::Y, 0.),
         Quat::from_axis_angle(Vec3::Y, TAU / 4.0),
@@ -115,10 +117,6 @@ pub fn scene_setup(
             })
         })
         .collect();
-
-    // println!("{:#?}", rotated_transform_array);
-
-    //println!("{}", TRANSFORM_ARRAY.len());
 
     for z in 0..MAP_HEIGHT {
         for x in 0..MAP_WIDTH {
@@ -145,25 +143,12 @@ pub fn scene_setup(
                             MeshMaterial3d(tile_materials.wall_cube_material_handle.clone()),
                             rotated_transform_array[direction],
                         ));
-                        sub_parent
-                            .spawn((
-                                Mesh3d(tile_materials.cube_mesh_handle.clone()),
-                                MeshMaterial3d(tile_materials.place_cube_material_handle.clone()),
-                                rotated_transform_array[direction + 4],
-                            ))
-                            .observe(update_material_on::<Pointer<Over>>(
-                                tile_materials.place_cube_hover_handle.clone(),
-                            ))
-                            .observe(update_material_on::<Pointer<Out>>(
-                                tile_materials.place_cube_material_handle.clone(),
-                            ))
-                            .observe(update_material_on::<Pointer<Click>>(
-                                tile_materials.place_cube_pressed_handle.clone(),
-                            ))
-                            .observe(update_material_on::<Pointer<Click>>(
-                                tile_materials.place_cube_hover_handle.clone(),
-                            ))
-                            .insert(Pickable::default());
+                        let mut entity = sub_parent.spawn((
+                            Mesh3d(tile_materials.cube_mesh_handle.clone()),
+                            MeshMaterial3d(tile_materials.place_cube_material_handle.clone()),
+                            rotated_transform_array[direction + 4],
+                        ));
+                        add_pickable_helper(&mut entity, &tile_materials);
                         match maze.tiles[maze.idx((x as i32, z as i32).into())].exits[direction] {
                             Exit::Open => {
                                 sub_parent.spawn((
@@ -182,90 +167,41 @@ pub fn scene_setup(
                                 ));
                             }
                             Exit::Closed => {
-                                sub_parent
-                                    .spawn((
-                                        Mesh3d(tile_materials.cube_mesh_handle.clone()),
-                                        MeshMaterial3d(
-                                            tile_materials.place_cube_material_handle.clone(),
-                                        ),
-                                        rotated_transform_array[direction + 20],
-                                    ))
-                                    .observe(update_material_on::<Pointer<Over>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Out>>(
+                                let mut entity = sub_parent.spawn((
+                                    Mesh3d(tile_materials.cube_mesh_handle.clone()),
+                                    MeshMaterial3d(
                                         tile_materials.place_cube_material_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_pressed_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .insert(Pickable::default());
-                                sub_parent
-                                    .spawn((
-                                        Mesh3d(tile_materials.cube_mesh_handle.clone()),
-                                        MeshMaterial3d(
-                                            tile_materials.place_cube_material_handle.clone(),
-                                        ),
-                                        rotated_transform_array[direction + 24],
-                                    ))
-                                    .observe(update_material_on::<Pointer<Over>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Out>>(
+                                    ),
+                                    rotated_transform_array[direction + 20],
+                                ));
+                                add_pickable_helper(&mut entity, &tile_materials);
+                                let mut entity = sub_parent.spawn((
+                                    Mesh3d(tile_materials.cube_mesh_handle.clone()),
+                                    MeshMaterial3d(
                                         tile_materials.place_cube_material_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_pressed_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .insert(Pickable::default());
-                                sub_parent
-                                    .spawn((
-                                        Mesh3d(tile_materials.cube_mesh_handle.clone()),
-                                        MeshMaterial3d(
-                                            tile_materials.place_cube_material_handle.clone(),
-                                        ),
-                                        rotated_transform_array[direction + 28],
-                                    ))
-                                    .observe(update_material_on::<Pointer<Over>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Out>>(
+                                    ),
+                                    rotated_transform_array[direction + 24],
+                                ));
+                                add_pickable_helper(&mut entity, &tile_materials);
+
+                                let mut entity = sub_parent.spawn((
+                                    Mesh3d(tile_materials.cube_mesh_handle.clone()),
+                                    MeshMaterial3d(
                                         tile_materials.place_cube_material_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_pressed_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .insert(Pickable::default());
-                                sub_parent
-                                    .spawn((
-                                        Mesh3d(tile_materials.cube_mesh_handle.clone()),
-                                        MeshMaterial3d(
-                                            tile_materials.place_cube_material_handle.clone(),
-                                        ),
-                                        rotated_transform_array[direction + 32],
-                                    ))
-                                    .observe(update_material_on::<Pointer<Over>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Out>>(
+                                    ),
+                                    rotated_transform_array[direction + 28],
+                                ));
+                                add_pickable_helper(&mut entity, &tile_materials);
+
+                                let mut entity = sub_parent.spawn((
+                                    Mesh3d(tile_materials.cube_mesh_handle.clone()),
+                                    MeshMaterial3d(
                                         tile_materials.place_cube_material_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_pressed_handle.clone(),
-                                    ))
-                                    .observe(update_material_on::<Pointer<Click>>(
-                                        tile_materials.place_cube_hover_handle.clone(),
-                                    ))
-                                    .insert(Pickable::default());
+                                    ),
+                                    rotated_transform_array[direction + 32],
+                                ));
+                                add_pickable_helper(&mut entity, &tile_materials);
+
                                 sub_parent.spawn((
                                     Mesh3d(tile_materials.short_wall_mesh_handle.clone()),
                                     MeshMaterial3d(
@@ -293,4 +229,20 @@ fn update_material_on<E: EntityEvent>(
     }
 }
 
-fn observer_helper(mut commands: EntityCommands) {}
+fn add_pickable_helper(commands: &mut EntityCommands, tile_materials: &TileMaterials) {
+    commands
+        .observe(update_material_on::<Pointer<Over>>(
+            tile_materials.place_cube_hover_handle.clone(),
+        ))
+        .observe(update_material_on::<Pointer<Out>>(
+            tile_materials.place_cube_material_handle.clone(),
+        ))
+        .observe(update_material_on::<Pointer<Click>>(
+            tile_materials.place_cube_pressed_handle.clone(),
+        ))
+        .observe(update_material_on::<Pointer<Click>>(
+            tile_materials.place_cube_hover_handle.clone(),
+        ))
+        .observe(on_click_spawn_tower)
+        .insert(Pickable::default());
+}

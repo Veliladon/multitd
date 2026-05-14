@@ -78,5 +78,6 @@ fn main() {
         // .disable::<LogPlugin>()
         .add_plugins(RemotePlugin::default())
         .add_plugins(RemoteHttpPlugin::default())
+        .init_state::<GameState>()
         .run();
 }

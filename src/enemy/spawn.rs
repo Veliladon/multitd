@@ -58,6 +58,7 @@ pub fn spawn_enemy(
                             index: 1,
                         },
                         FollowsLane { 0: 1 },
+                        Enemy {},
                     ));
                 });
         }

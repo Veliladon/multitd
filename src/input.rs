@@ -46,6 +46,7 @@ impl Plugin for ProcessInputPlugin {
             .add_systems(Update, switch_input_types)
             .add_systems(Update, zoom_camera)
             .add_systems(Update, move_camera)
+            .add_systems(Update, pause_unpause)
             .add_systems(Update, builder_control);
     }
 }
@@ -102,7 +103,7 @@ pub fn switch_input_types(
 
 pub fn move_camera(
     mut camera_query: Query<(&mut Transform, &ActionState<CameraMovement>), With<Camera>>,
-    time: Res<Time>,
+    time: Res<Time<Real>>,
 ) {
     let (mut camera_transform, action_state) = camera_query.single_mut().unwrap();
     let mut axis_pair = action_state.clamped_axis_pair(&CameraMovement::Pan);
@@ -119,3 +120,25 @@ pub fn builder_control(mut camera_query: Query<&ActionState<BuilderAction>, With
 }
 
 pub fn player_control() {}
+
+pub fn pause_unpause(
+    input: Res<ButtonInput<KeyCode>>,
+    mut time: ResMut<Time<Virtual>>,
+    game_state: Res<State<GameState>>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    if input.just_pressed(KeyCode::Pause) {
+        match game_state.get() {
+            GameState::Pause => {
+                time.unpause();
+                next_state.set(GameState::Running);
+                info!("Unpaused!")
+            }
+            GameState::Running => {
+                time.pause();
+                next_state.set(GameState::Pause);
+                info!("Pausing...")
+            }
+        }
+    }
+}

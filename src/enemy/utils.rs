@@ -20,6 +20,9 @@ pub struct Mobile {
     pub index: usize,
 }
 
+#[derive(Component)]
+pub struct Enemy {}
+
 #[derive(Component, DerefMut, Deref)]
 pub struct FollowsLane(pub usize);
 

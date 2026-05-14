@@ -44,7 +44,7 @@ pub struct MazeRoute {
 #[derive(Resource, Deref, DerefMut)]
 pub struct MazeEntityMap(pub Vec<Entity>);
 
-#[derive(Resource)]
+#[derive(Resource, Clone)]
 pub struct TileMaterials {
     pub ground_mesh_handle: Handle<Mesh>,
     pub ground_material_handle: Handle<StandardMaterial>,

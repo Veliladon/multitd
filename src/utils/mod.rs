@@ -34,3 +34,10 @@ pub const DIRECTIONS: [IVec2; 4] = [
     IVec2 { x: 0, y: -1 },
     IVec2 { x: -1, y: 0 },
 ];
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, States)]
+pub enum GameState {
+    #[default]
+    Running,
+    Pause,
+}
